@@ -13,7 +13,7 @@ e = -1/2*c/2; % Pitching axis (measured from the midchord) [m]
 M = 0.3; % Mach number
 k = 0.1; % Reduced frequency
 n_cycles = 10; % Number of cycles that are computed
-n_t = 50; % Number of time steps per cycle
+n_t = 100; % Number of time steps per cycle
 
 % Motion
 alphabase = deg2rad(5); % Initial angle [rad]
@@ -68,7 +68,7 @@ Cnprime = BL_stallonset(s,T_P,C_Nalpha*alpha_E,Cnp);
 
 %% Trailing edge separation
 
-[Cnf, Cmf, Ccf, fprimeprime, fprime] = BL_TEseparation(s,Cnprime,C_Nalpha,C_N1,C_M0,alpha,alpha_E,alpha1,dalpha1,S1,S2,T_f,T_vl,K0,K1,K2,eta,D_f);
+[Cnf, Cmf, Ccf, fprimeprime, fprime] = BL_TEseparation(s,Cnprime,C_Nalpha,C_N1,C_M0,alpha0,alpha,alpha_E,alpha1,dalpha1,S1,S2,T_f,T_vl,K0,K1,K2,eta,D_f);
 
 %% Modeling of dynamic stall
 
@@ -78,7 +78,7 @@ Cnprime = BL_stallonset(s,T_P,C_Nalpha*alpha_E,Cnp);
 
 % Total normal force
 CN = Cnf+Cnv+Cni;
-CM = Cmp+Cmf+Cmv-K0*C_Nalpha*alpha_E;
+CM = Cmf+Cmv+Cmp-K0*C_Nalpha*alpha_E;
 
 figure(1);
 plot(rad2deg(alpha_eff(N-n_t:N)),Cnp(N-n_t:N),rad2deg(alpha_eff(N-n_t:N)),Cnf(N-n_t:N),rad2deg(alpha_eff(N-n_t:N)),Cnv(N-n_t:N));
@@ -92,7 +92,7 @@ CL = CN.*cos(alpha_eff)+Ccf.*sin(alpha_eff);
 CD = CN.*sin(alpha_eff)-Ccf.*cos(alpha_eff)+Cd0;
 
 % Comparison with experimental results
-[alpha_el,CN_e,alpha_ed,CD_e] = experimental_results(airfoil,k,alphabase,A_alpha);
+[alpha_el,CN_e,alpha_ed,CD_e,alpha_em,CM_e] = experimental_results(airfoil,k,alphabase,A_alpha);
 
 figure(2);
 plot(rad2deg(alpha_eff(N-n_t:N)),CN(N-n_t:N),'r')
@@ -116,6 +116,9 @@ title([airfoil,', k=',num2str(k),', $\alpha=',num2str(rad2deg(alphabase)),'^{o}+
 figure(4);
 plot(rad2deg(alpha_eff(N-n_t:N)),CM(N-n_t:N),'r')
 grid on
+hold on; plot(alpha_em,CM_e,'--')
+hold on; plot (alpha_em,CM_e,'o')
+legend('Model','Experimental','Location','best')
 xlabel('\alpha [º]');
-ylabel('C_{M}');
+ylabel('C_{M}'); xlim([-5 15]); ylim([-.2 .1]);
 title([airfoil,', k=',num2str(k),', $\alpha=',num2str(rad2deg(alphabase)),'^{o}+',num2str(rad2deg(A_alpha)),'^{o}sin(\omega t)$'],'interpreter','latex');

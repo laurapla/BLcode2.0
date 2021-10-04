@@ -1,4 +1,4 @@
-function [Cnf, Cmf, Ccf, fprimeprime, fprime] = BL_TEseparation(s_span,Cnprime,C_Nalpha,C_N1,Cm0,alpha,alpha_E,alpha1,dalpha1,S1,S2,T_f,T_vl,K0,K1,K2,eta,D_f)
+function [Cnf, Cmf, Cc, fprimeprime, fprime] = BL_TEseparation(s_span,Cnprime,C_Nalpha,C_N1,Cm0,alpha0,alpha,alpha_E,alpha1,dalpha1,S1,S2,T_f,T_vl,K0,K1,K2,eta,D_f)
 
 % Function that computes the variations in the normal force, pitching
 % moment and drag force coefficients due to trailing edge separation
@@ -22,11 +22,11 @@ function [Cnf, Cmf, Ccf, fprimeprime, fprime] = BL_TEseparation(s_span,Cnprime,C
 % eta = viscous effects factor
 
 % Effective angle of attack (for separation)
-alpha_f = Cnprime./C_Nalpha;
+alpha_f = Cnprime./C_Nalpha+alpha0;
 
 tauv = vortex_time(Cnprime,s_span,C_N1);
 
-tolerance = 1e-5;
+tolerance = 2e-4;
 
 N = size(s_span,2);
 Df = zeros(1,N);
@@ -42,7 +42,7 @@ for i = 2:N
     ds = s_span(i)-s_span(i-1);
     Sa = alpha(i)-alpha(i-1);
     if Sa<0
-        Da1 = ((1-fprimeprime(i-1))^0.25*dalpha1);
+        Da1 = (1-fprimeprime(i-1))^0.25*dalpha1;
     else
         Da1 = 0;
     end
@@ -72,7 +72,7 @@ for i = 2:N
         Dfr(i) = Dfr(i-1)*Em+(fM(i)-fM(i-1))*Em^0.5;
         fr(i) = fM(i)-Dfr(i);
         
-        resta = max(abs(fprimeprime(i)-fprimeprime_ant),abs(fr(i)-fr_ant));
+        resta = abs(fprimeprime(i)-fprimeprime_ant);
         fprimeprime_ant = fprimeprime(i);
         fr_ant = fr(i);
         
@@ -86,7 +86,7 @@ Cnf = Cnc.*((1+sqrt(fprimeprime))/2).^2;
 
 % Pitching moment coefficient
 m = 2;
-Cmf = (K0+K1*(1-fr)+K2*sin(pi*fr.^m)).*Cnc+Cm0;
+Cmf = (K0+K1*(1-fr)+K2*sin(pi*fr.^m)).*Cnc.*(1+sqrt(fr)).^2/4+Cm0;
 
 % Drag force coefficient
 Phi = zeros(1,N);
@@ -98,6 +98,6 @@ for i = 1:N
         Phi(i) = fprimeprime(i)^exponent;
     end
 end
-Ccf = eta*Cnc.*sin(alpha_E).*sqrt(fprimeprime).*Phi; % Chord force coefficient
+Cc = eta*Cnc.*tan(alpha_E+alpha0).*sqrt(fprimeprime).*Phi; % Chord force coefficient
 
 end

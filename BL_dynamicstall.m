@@ -43,6 +43,6 @@ CPv = 0.25*(1-cos(pi*tauv/T_vl));
 Cmv = -CPv.*Cnv;
 
 % Drag force coefficient
-Cdv = ones(1,N);
+Cdv = zeros(1,N);
 
 end

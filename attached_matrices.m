@@ -13,13 +13,15 @@ beta = sqrt(1-M^2);
 A1 = 0.636; A2 = 1-A1; A3 = 1.5; A4 = -0.5; A5 = 1.0;
 b1 = 0.339; b2 = 0.249; b3 = 0.25; b4 = 0.1; b5 = 0.5;
 kNa = 0.75; kNq = 0.75; kMa = 0.8; kMq = 0.8;
+% A1 = 0.3; A2 = 1-A1; A3 = 1.5; A4 = -0.5; A5 = 1.0;
+% b1 = 0.14; b2 = 0.53; b3 = 0.25; b4 = 0.1; b5 = 0.5;
 % kNa = 1; kNq = 1; kMa = 1; kMq = 1;
 
 a = V/M; % Sound speed
 T_I = c/a; % Basic non-circulatory time constant
 
 % Constants
-K_alpha = kNa/((1-M)+pi*beta*M^2*(A1*b1+A2*b2));
+K_alpha = kNa/((1-M)+C_Nalpha*beta*M^2*(A1*b1+A2*b2));
 K_q = kNq/(0.5*(1-M)+2*pi*beta*M^2*(A1*b1+A2*b2));
 K_alphaM = kMa*(A3*b4+A4*b3)/(b3*b4*(1-M));
 K_qM = 7*kMq/(15*(1-M)+3*pi*beta*M^2*A5*b5);
