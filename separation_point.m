@@ -6,11 +6,8 @@ function f = separation_point(alpha,alpha1,S1,S2)
 % alpha = angle of attack in which we want to know the separation point
 % [deg]
 % alpha1 = alpha corresponding to f=0.7 [deg]
-% S1 = coefficient that defines the stall characteristic
-% S2 = coefficient that defines the stall characteristic
-
-alpha = rad2deg(alpha);
-alpha1 = rad2deg(alpha1);
+% S1 = coefficient that defines the stall characteristic [deg]
+% S2 = coefficient that defines the stall characteristic [deg]
 
 N = length(alpha);
 f = zeros(1,N);

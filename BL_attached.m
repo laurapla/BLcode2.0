@@ -1,4 +1,4 @@
-function [Cnp, Cmp, Ccp, alpha_E, Cni] = BL_attached(t_span,alpha,q,V,M,c,C_Nalpha,alpha0,x_ac)
+function [Cnp, Cmp, Ccp, alpha_E, Cni] = BL_attached(t_span,alpha,q,V,M,c,C_Nalpha,alpha0,Cm0,x_ac)
 
 % Function that computes the normal force coefficient, the moment
 % coefficient and the drag force coefficient of the attached flow
@@ -14,36 +14,7 @@ function [Cnp, Cmp, Ccp, alpha_E, Cni] = BL_attached(t_span,alpha,q,V,M,c,C_Nalp
 % M = Mach number
 % c = airfoil chord [m]
 % C_Nalpha = normal force curve slope [1/rad]
-% % x_ac = aerodynamic center normalized by the chord
-% 
-% % Time vector (to solve the dynamics)
-% time = t_span;
-% 
-% % Matrices of the system
-% [A,B,C,D] = attached_matrices(V,M,c,C_Nalpha,x_ac);
-% 
-% % Inputs of the system
-% u = [alpha; q];
-% 
-% % Initial conditions
-% xi = zeros(8,1);
-% 
-% % System of equations
-% opts = odeset('RelTol',1e-5,'AbsTol',1e-8);
-% [~,x] = ode45(@(t,x) dx_attached(t,x,A,B,alpha,q,time),t_span,xi,opts);
-% x = x.';
-% 
-% % Output
-% y = C*x+D*u;
-% Cnp = y(1,:);
-% Cmp = y(2,:);
-% 
-% % Circulatory and non-circulatory components
-% alpha_E = effective_angle(sqrt(1-M^2),V,c,x(1,:),x(2,:)); % Effective angle [rad]
-% Cn_i = Cnp-C_Nalpha*(alpha_E);
-% 
-% % Drag force
-% Ccp = C_Nalpha*sin(alpha_E).^2; % Chord force coefficient
+% x_ac = aerodynamic center normalized by the chord
 
 % Prandtl-Glauert compressibility correction factor
 beta = sqrt(1-M^2);
@@ -57,14 +28,12 @@ a = V/M; % Speed of sound
 T_I = c/a; % Basic non-circulatory time constant
 
 % Constants
-K_alpha = kNa/((1-M)+C_Nalpha*beta*M^2*(A1*b1+A2*b2));
+K_alpha = kNa/((1-M)+pi*beta*M^2*(A1*b1+A2*b2));
 K_q = kNq/(0.5*(1-M)+2*pi*beta*M^2*(A1*b1+A2*b2));
 K_qM = 7*kMq/(15*(1-M)+3*pi*beta*M^2*A5*b5);
 
 T_alpha = K_alpha*T_I;
 T_q = K_q*T_I;
-
-C_Nalphac = C_Nalpha/beta;
 
 % Dimensions
 s_span = 2*V*t_span/c;
@@ -92,8 +61,8 @@ for i = 2:N
     dqt(i) = dq/dt;
     
     % Circulatory - AOA contribution
-    X1(i) = X1(i-1)*exp(-b1*beta^2*ds)+A1*exp(-b1*beta^2*ds/2)*da;
-    X2(i) = X2(i-1)*exp(-b2*beta^2*ds)+A2*exp(-b2*beta^2*ds/2)*da;
+    X1(i) = X1(i-1)*exp(-b1*beta^2*ds)+A1*(1-exp(-b1*beta^2*ds))*(da+dq/2)/(b1*ds);
+    X2(i) = X2(i-1)*exp(-b2*beta^2*ds)+A2*(1-exp(-b2*beta^2*ds))*(da+dq/2)/(b1*ds);
     
     % Circulatory - Pitch rate contribution
     X3(i) = X3(i-1)*exp(-b1*beta^2*ds)+A1*exp(-b1*beta^2*ds/2)*dq;
@@ -108,8 +77,8 @@ for i = 2:N
 end
 
 % Circulatory normal force
-alpha_E= alpha-alpha0-X1-X2;
-Cnc = C_Nalphac*alpha_E;
+alpha_E= alpha+q/2-alpha0-X1-X2;
+Cnc = C_Nalpha*alpha_E;
 
 % Non-circulatory normal force
 Cni_a = 4*T_alpha/M*(dat-Kprime_a);
@@ -136,7 +105,7 @@ for i = 2:N
 end
 
 % Circulatory moment
-Cmc_a = -C_Nalphac*(1-A1*exp(-b1*beta^2*s_span)-A2*exp(-b2*beta^2*s_span))*(x_ac-0.25);
+Cmc_a = -C_Nalpha*(1-A1*exp(-b1*beta^2*s_span)-A2*exp(-b2*beta^2*s_span))*(x_ac-0.25);
 Cmc_q = -C_Nalpha/(16*beta)*(q-Kprimeprime_qM)*c/V;
 Cmc = Cmc_a+Cmc_q;
 
@@ -146,7 +115,7 @@ Cmi_q = -7*K_qM^2*T_I/(12*M)*(dqt-Kprime_qM);
 Cmi = Cmi_a+Cmi_q;
 
 % Total aerodynamic moment coefficient
-Cmp = Cmc+Cmi;
+Cmp = Cmc+Cmi+Cm0;
 
 
 % CHORD FORCE

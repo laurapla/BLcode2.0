@@ -29,14 +29,14 @@ D_f_data = [8.0 7.75 6.2 6.0 5.9 5.5 4.0]; % Loss in chord force due to dynamic 
 
 
 % Interpolation
-C_Nalpha = rad2deg(interp1(M_data,C_Nalpha_data,M)); % Normal force curve slope [1/deg]
-alpha0 = deg2rad(interp1(M_data,alpha0_data,M)); % Angle of zero lift [deg]
+C_Nalpha = rad2deg(interp1(M_data,C_Nalpha_data,M)); % Normal force curve slope [1/rad]
+alpha0 = deg2rad(interp1(M_data,alpha0_data,M)); % Angle of zero lift [rad]
 Cd0 = interp1(M_data,Cd0_data,M); % Drag coefficient at alpha = 0
 C_M0 = interp1(M_data,C_M0_data,M); % Zero-lift moment coefficient
-alpha1 = deg2rad(interp1(M_data,alpha1_data,M)); % Angle at which f=0.7 [deg]
-dalpha1 = deg2rad(interp1(M_data,dalpha1_data,M)); % Dynamic offset of alpha1 [deg]
-S1 = interp1(M_data,S1_data,M); % Coefficient that defines the stall characteristics [deg]
-S2 = interp1(M_data,S2_data,M); % Coefficient that defines the stall characteristics [deg]
+alpha1 = deg2rad(interp1(M_data,alpha1_data,M)); % Angle at which f=0.7 [rad]
+dalpha1 = deg2rad(interp1(M_data,dalpha1_data,M)); % Dynamic offset of alpha1 [rad]
+S1 = deg2rad(interp1(M_data,S1_data,M)); % Coefficient that defines the stall characteristics [rad]
+S2 = deg2rad(interp1(M_data,S2_data,M)); % Coefficient that defines the stall characteristics [rad]
 K0 = interp1(M_data,K0_data,M); % Aerodynamic center offset from the 1/4-chord
 K1 = interp1(M_data,K1_data,M); % Direct effect on the center of pressure due to the growth of the separated flow region
 K2 = interp1(M_data,K2_data,M); % Describes the shape of the moment break at stall

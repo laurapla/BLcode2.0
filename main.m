@@ -13,7 +13,7 @@ e = -1/2*c/2; % Pitching axis (measured from the midchord) [m]
 M = 0.3; % Mach number
 k = 0.1; % Reduced frequency
 n_cycles = 10; % Number of cycles that are computed
-n_t = 100; % Number of time steps per cycle
+n_t = 1e2; % Number of time steps per cycle
 
 % Motion
 alphabase = deg2rad(5); % Initial angle [rad]
@@ -27,7 +27,7 @@ R = 287.058; % Specific gas constant for dry air [J/kg·K]
 Ta = 298; % Ambient temperature [K]
 
 % Numerical values
-[eta, C_Nalpha, alpha0, Cd0, C_M0, alpha1, dalpha1, S1, S2, K0, K1, K2, T_P, T_f, C_N1, T_v, T_vl, D_f] = input_NACA0012(M);
+[eta, C_Nalpha, alpha0, Cd0, Cm0, alpha1, dalpha1, S1, S2, K0, K1, K2, T_P, T_f, C_N1, T_v, T_vl, D_f] = input_NACA0012(M);
 x_ac = 0.25-K0; % Aerodynamic center normalized by the chord
 
 %% Preliminary calculations
@@ -60,7 +60,7 @@ alpha_eff = alpha+atan(dh./V);
 
 q = dalpha*c/V; % Non-dimensional pitch rate
 
-[Cnp, Cmp, Ccp, alpha_E, Cni] = BL_attached(t,alpha_eff,q,V,M,c,C_Nalpha,alpha0,x_ac);
+[Cnp, Cmp, Ccp, alpha_E, Cni] = BL_attached(t,alpha_eff,q,V,M,c,C_Nalpha,alpha0,Cm0,x_ac);
 
 %% Stall onset
 
@@ -68,11 +68,11 @@ Cnprime = BL_stallonset(s,T_P,C_Nalpha*alpha_E,Cnp);
 
 %% Trailing edge separation
 
-[Cnf, Cmf, Ccf, fprimeprime, fprime] = BL_TEseparation(s,Cnprime,C_Nalpha,C_N1,C_M0,alpha0,alpha,alpha_E,alpha1,dalpha1,S1,S2,T_f,T_vl,K0,K1,K2,eta,D_f);
+[Cnf, Cmf, Ccf, fprimeprime, fprime] = BL_TEseparation(s,Cnprime,C_Nalpha,C_N1,alpha0,alpha,alpha_E,alpha1,dalpha1,S1,S2,T_f,T_vl,K0,K1,K2,eta,D_f);
 
 %% Modeling of dynamic stall
 
-[Cnv, Cmv, Ccv] = BL_dynamicstall(s,fprimeprime,alpha,alpha_E,Cnprime,C_Nalpha,T_v,T_vl,C_N1);
+[Cnv, Cmv] = BL_dynamicstall(s,fprimeprime,alpha,alpha_E,Cnprime,C_Nalpha,T_v,T_vl,C_N1);
 
 %% Final results
 

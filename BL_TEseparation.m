@@ -1,4 +1,4 @@
-function [Cnf, Cmf, Cc, fprimeprime, fprime] = BL_TEseparation(s_span,Cnprime,C_Nalpha,C_N1,Cm0,alpha0,alpha,alpha_E,alpha1,dalpha1,S1,S2,T_f,T_vl,K0,K1,K2,eta,D_f)
+function [Cnf, Cmf, Cc, fprimeprime, fprime] = BL_TEseparation(s_span,Cnprime,C_Nalpha,C_N1,alpha0,alpha,alpha_E,alpha1,dalpha1,S1,S2,T_f,T_vl,K0,K1,K2,eta,D_f)
 
 % Function that computes the variations in the normal force, pitching
 % moment and drag force coefficients due to trailing edge separation
@@ -81,12 +81,12 @@ for i = 2:N
 end
 
 % Normal force coefficient
-Cnc = C_Nalpha*sin(alpha_E); % Circulatory normal force coefficient
+Cnc = C_Nalpha*alpha_E; % Circulatory normal force coefficient
 Cnf = Cnc.*((1+sqrt(fprimeprime))/2).^2;
 
 % Pitching moment coefficient
 m = 2;
-Cmf = (K0+K1*(1-fr)+K2*sin(pi*fr.^m)).*Cnc.*(1+sqrt(fr)).^2/4+Cm0;
+Cmf = (K0+K1*(1-fr)+K2*sin(pi*fr.^m)).*Cnc.*(1+sqrt(fr)).^2/4;
 
 % Drag force coefficient
 Phi = zeros(1,N);
