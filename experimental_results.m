@@ -1,32 +1,32 @@
-function [alpha_el,CN_e,alpha_ed,CD_e,alpha_em,CM_e] = experimental_results(airfoil,k,alphabase,A_alpha)
+function [alpha_el,CN_e,alpha_ed,CD_e,alpha_em,CM_e] = experimental_results(airfoil,k,M,alphabase,A_alpha,H,phi)
 
-if strcmp(airfoil,'NACA0012') && k == 0.1 && alphabase == deg2rad(5) && A_alpha == deg2rad(10)
+if strcmp(airfoil,'NACA0012') && k == 0.1 && alphabase == deg2rad(5) && A_alpha == deg2rad(10) && H==0 && phi==0 && M<=0.3
     Exp = 1;
-elseif strcmp(airfoil,'HH02') && k == 0.1 && alphabase == deg2rad(5) && A_alpha == deg2rad(10)
+elseif strcmp(airfoil,'HH02') && k == 0.1 && alphabase == deg2rad(5) && A_alpha == deg2rad(10) && H==0 && phi==0 && M<=0.3
     Exp = 2;
-elseif strcmp(airfoil,'SC1095') && k == 0.1 && alphabase == deg2rad(5) && A_alpha == deg2rad(10)
+elseif strcmp(airfoil,'SC1095') && k == 0.1 && alphabase == deg2rad(5) && A_alpha == deg2rad(10) && H==0 && phi==0 && M<=0.3
     Exp = 3;
-elseif strcmp(airfoil,'NACA0012') && k == 0.1 && alphabase == deg2rad(10) && A_alpha == deg2rad(10)
+elseif strcmp(airfoil,'NACA0012') && k == 0.1 && alphabase == deg2rad(10) && A_alpha == deg2rad(10) && H==0 && phi==0 && M<=0.3
     Exp = 4;
-elseif strcmp(airfoil,'HH02') && k == 0.1 && alphabase == deg2rad(10) && A_alpha == deg2rad(10)
+elseif strcmp(airfoil,'HH02') && k == 0.1 && alphabase == deg2rad(10) && A_alpha == deg2rad(10) && H==0 && phi==0 && M<=0.3
     Exp = 5;
-elseif strcmp(airfoil,'SC1095') && k == 0.1 && alphabase == deg2rad(10) && A_alpha == deg2rad(10)
+elseif strcmp(airfoil,'SC1095') && k == 0.1 && alphabase == deg2rad(10) && A_alpha == deg2rad(10) && H==0 && phi==0 && M<=0.3
     Exp = 6;
-elseif strcmp(airfoil,'NACA0012') && k == 0.1 && alphabase == deg2rad(15) && A_alpha == deg2rad(10)
+elseif strcmp(airfoil,'NACA0012') && k == 0.1 && alphabase == deg2rad(15) && A_alpha == deg2rad(10) && H==0 && phi==0 && M<=0.3
     Exp = 7;
-elseif strcmp(airfoil,'HH02') && k == 0.1 && alphabase == deg2rad(15) && A_alpha == deg2rad(10)
+elseif strcmp(airfoil,'HH02') && k == 0.1 && alphabase == deg2rad(15) && A_alpha == deg2rad(10) && H==0 && phi==0 && M<=0.3
     Exp = 8;
-elseif strcmp(airfoil,'SC1095') && k == 0.1 && alphabase == deg2rad(15) && A_alpha == deg2rad(10)
+elseif strcmp(airfoil,'SC1095') && k == 0.1 && alphabase == deg2rad(15) && A_alpha == deg2rad(10) && H==0 && phi==0 && M<=0.3
     Exp = 9;
-elseif strcmp(airfoil,'NACA0012') && k == 0.074 && alphabase == deg2rad(2.1) && A_alpha == deg2rad(8.2)
+elseif strcmp(airfoil,'NACA0012') && k == 0.074 && alphabase == deg2rad(2.1) && A_alpha == deg2rad(8.2) && H==0 && phi==0 && M<=0.3
     Exp = 10;
-elseif strcmp(airfoil,'NACA0012') && k == 0.075 && alphabase == deg2rad(10.3) && A_alpha == deg2rad(8.1)
+elseif strcmp(airfoil,'NACA0012') && k == 0.075 && alphabase == deg2rad(10.3) && A_alpha == deg2rad(8.1) && H==0 && phi==0 && M<=0.3
     Exp = 11;
-elseif strcmp(airfoil,'NACA0012') && k == 0.1 && alphabase == deg2rad(10) && A_alpha == deg2rad(15)
+elseif strcmp(airfoil,'NACA0012') && k == 0.1 && alphabase == deg2rad(10) && A_alpha == deg2rad(15) && H==0 && phi==0 && M<=0.3
     Exp = 12;
-elseif strcmp(airfoil,'NACA0012') && k == 0.1 && alphabase == deg2rad(0) && A_alpha == deg2rad(10)
+elseif strcmp(airfoil,'NACA0012') && k == 0.1 && alphabase == deg2rad(0) && A_alpha == deg2rad(10) && H==0 && phi==0 && M<=0.3
     Exp = 13;
-elseif strcmp(airfoil,'NACA0012') && k == 0.1 && alphabase == deg2rad(0) && A_alpha == deg2rad(15)
+elseif strcmp(airfoil,'NACA0012') && k == 0.1 && alphabase == deg2rad(0) && A_alpha == deg2rad(15) && H==0 && phi==0 && M<=0.3
     Exp = 14;
 else
     Exp = 0;

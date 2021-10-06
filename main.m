@@ -9,7 +9,7 @@ clear; clc; close all;
 % Geometry
 airfoil = ('NACA0012');
 c = 1; % Airfoil chord [m]
-e = -1/2*c/2; % Pitching axis (measured from the midchord) [m]
+e = -1/2*1/2; % Pitching axis (measured from the midchord) normalized by the chord
 M = 0.3; % Mach number
 k = 0.1; % Reduced frequency
 n_cycles = 10; % Number of cycles that are computed
@@ -60,7 +60,7 @@ alpha_eff = alpha+atan(dh./V);
 
 q = dalpha*c/V; % Non-dimensional pitch rate
 
-[Cnp, Cmp, Ccp, alpha_E, Cni] = BL_attached(t,alpha_eff,q,V,M,c,C_Nalpha,alpha0,Cm0,x_ac);
+[Cnp, Cmp, Ccp, alpha_E, Cni] = BL_attached(t,alpha_eff,q,V,M,c,e,C_Nalpha,alpha0,Cm0,x_ac);
 
 %% Stall onset
 
@@ -92,7 +92,7 @@ CL = CN.*cos(alpha_eff)+Ccf.*sin(alpha_eff);
 CD = CN.*sin(alpha_eff)-Ccf.*cos(alpha_eff)+Cd0;
 
 % Comparison with experimental results
-[alpha_el,CN_e,alpha_ed,CD_e,alpha_em,CM_e] = experimental_results(airfoil,k,alphabase,A_alpha);
+[alpha_el,CN_e,alpha_ed,CD_e,alpha_em,CM_e] = experimental_results(airfoil,k,M,alphabase,A_alpha,H,phi);
 
 figure(2);
 plot(rad2deg(alpha_eff(N-n_t:N)),CN(N-n_t:N),'r')
@@ -120,5 +120,5 @@ hold on; plot(alpha_em,CM_e,'--')
 hold on; plot (alpha_em,CM_e,'o')
 legend('Model','Experimental','Location','best')
 xlabel('\alpha [º]');
-ylabel('C_{M}'); xlim([-5 15]); ylim([-.2 .1]);
+ylabel('C_{M}');
 title([airfoil,', k=',num2str(k),', $\alpha=',num2str(rad2deg(alphabase)),'^{o}+',num2str(rad2deg(A_alpha)),'^{o}sin(\omega t)$'],'interpreter','latex');
