@@ -98,9 +98,9 @@ figure(2);
 plot(rad2deg(alpha_eff(N-n_t:N)),CN(N-n_t:N),'r')
 xlabel('\alpha [º]'); ylabel('C_{N}');
 grid on
-hold on; plot (alpha_el,CN_e,'--')
+hold on; plot(alpha_el,CN_e,'--')
 hold on; plot (alpha_el,CN_e,'o')
-legend('Model','Experimental','Location','best');
+legend('Model','Numerical','Location','best');
 title([airfoil,', k=',num2str(k),', $\alpha=',num2str(rad2deg(alphabase)),'^{o}+',num2str(rad2deg(A_alpha)),'^{o}sin(\omega t)$'],'interpreter','latex');
 
 figure(3);
