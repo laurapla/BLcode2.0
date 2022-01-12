@@ -7,7 +7,7 @@ clear; clc; close all;
 %% Loading files
 
 addpath(genpath('../'),genpath('/data'),genpath('../experimental_data'))
-load('dCv_aH.mat');
+load('dCv_H.mat');
 load('CN_NACA0012_static.mat');
 
 %% Input data
@@ -15,7 +15,7 @@ load('CN_NACA0012_static.mat');
 % Geometry
 airfoil = ('NACA0012');
 M = 0.3; % Mach number
-k = 0.3; % Reduced frequency
+k = 0.5; % Reduced frequency
 
 % Motion
 n_H = 12;
@@ -35,7 +35,7 @@ alpha = deg2rad(linspace(0,45,N));
 % State x11 (dCv)
 [oldcols,oldrows] = meshgrid(H_array,alpha_array);
 [newcols, newrows] = meshgrid(H,alpha);
-x11 = interp2(oldcols,oldrows,dCv_alphaH,newcols,newrows);
+x11 = interp2(oldcols,oldrows,dCv,newcols,newrows);
 
 %% Averaged Cl
 

@@ -99,15 +99,15 @@ plot(rad2deg(alpha_eff(N-n_t:N)),CN(N-n_t:N),'r')
 xlabel('\alpha [º]'); ylabel('C_{N}');
 grid on
 hold on; plot(alpha_el,CN_e,'--')
-hold on; plot (alpha_el,CN_e,'o')
-legend('Model','Numerical','Location','best');
+hold on; plot(alpha_el,CN_e,'o')
+legend('Model','Experimental','Location','best');
 title([airfoil,', k=',num2str(k),', $\alpha=',num2str(rad2deg(alphabase)),'^{o}+',num2str(rad2deg(A_alpha)),'^{o}sin(\omega t)$'],'interpreter','latex');
 
 figure(3);
 plot(rad2deg(alpha_eff(N-n_t:N)),CD(N-n_t:N),'r')
 grid on
 hold on; plot(alpha_ed,CD_e,'--')
-hold on; plot (alpha_ed,CD_e,'o')
+hold on; plot(alpha_ed,CD_e,'o')
 legend('Model','Experimental','Location','best')
 xlabel('\alpha [º]');
 ylabel('C_{D}');
@@ -117,7 +117,7 @@ figure(4);
 plot(rad2deg(alpha_eff(N-n_t:N)),CM(N-n_t:N),'r')
 grid on
 hold on; plot(alpha_em,CM_e,'--')
-hold on; plot (alpha_em,CM_e,'o')
+hold on; plot(alpha_em,CM_e,'o')
 legend('Model','Experimental','Location','best')
 xlabel('\alpha [º]');
 ylabel('C_{M}');

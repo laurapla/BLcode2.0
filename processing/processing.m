@@ -5,7 +5,7 @@
 clear; clc; close all;
 
 % Parameters of Data Processing
-parameter = 'H';
+parameter = 'A';
 if strcmp(parameter,'A')
     interval = 2;
     number = 15;

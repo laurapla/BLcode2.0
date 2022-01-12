@@ -16,7 +16,7 @@ Fs = 1/(t(2)-t(1));
 
 Y = fft(dCv_array(:,1));
 
-P2 = abs(Y/n_t);
+P2 = abs(Y/N);
 P1 = P2(1:n_t/2+1);
 P1(2:end-1) = 2*P1(2:end-1);
 

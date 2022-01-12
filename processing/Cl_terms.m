@@ -92,6 +92,7 @@ for iter = 1:8+1
     end
 end
 legend(Legend,'Location','bestoutside')
+grid on; grid minor
 
 %% Terms
 
