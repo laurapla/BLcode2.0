@@ -28,12 +28,12 @@ phi = deg2rad(0); % Phase between the pitching and plunging motions [rad]
 
 % Angle parameters
 N = 200;
-alpha = deg2rad(linspace(0,45,N));
+alpha = deg2rad(linspace(0,45,N)).';
 
 %% Averaged Cl
 
 % State x10 (separation point)
-x10 = separation_point(alpha-H*k*sin(phi),alpha1,S1,S2);
+x10 = separation_point(alpha-H*k*sin(phi),alpha1,S1,S2).';
 
 % State x11 (dCv)
 [oldcols,oldrows] = meshgrid(A_array,alpha_array);
@@ -52,19 +52,17 @@ t7 = zeros(N,n_A);
 t8 = zeros(N,n_A);
 
 for j = 1:n_A
-    for i = 1:N
-        
-        % Averaged lift coefficient
-        t1(i,j) = x11(i,j)*cos(alpha(i));
-        t2(i,j) = C_Nalpha/2*(alpha(i)-H*k*sin(phi))*(1+sqrt(x10(i)))^2/2*cos(alpha(i));
-        t3(i,j) = C_Nalpha/2*(alpha(i)-H*k*sin(phi))*2*eta*(alpha(i)-H*k*sin(phi))*sqrt(x10(i))*sin(alpha(i));
-        t4(i,j) = -deg2rad(A_alpha(j))^2/4*x11(i,j)*cos(alpha(i));
-        t5(i,j) = -deg2rad(A_alpha(j))^2/4*sin(alpha(i))/(8*M);
-        t6(i,j) = -deg2rad(A_alpha(j))^2/4*C_Nalpha*alpha(i)/2*(1+sqrt(x10(i)))^2/2*cos(alpha(i));
-        t7(i,j) = -deg2rad(A_alpha(j))^2/4*eta*C_Nalpha*alpha(i)^2*sqrt(x10(i))*sin(alpha(i));
-        t8(i,j) = deg2rad(A_alpha(j))*H*k/M*sin(alpha(i))*sin(phi);
-        
-    end
+    
+    % Averaged lift coefficient
+    t1(:,j) = x11(:,j).*cos(alpha(i));
+    t2(:,j) = C_Nalpha/2*(alpha-H*k*sin(phi)).*(1+sqrt(x10)).^2/2.*cos(alpha);
+    t3(:,j) = C_Nalpha/2*(alpha-H*k*sin(phi))*2*eta.*(alpha-H*k*sin(phi)).*sqrt(x10).*sin(alpha);
+    t4(:,j) = -deg2rad(A_alpha(j))^2/4*x11(:,j).*cos(alpha);
+    t5(:,j) = -deg2rad(A_alpha(j))^2/4*sin(alpha)/(8*M);
+    t6(:,j) = -deg2rad(A_alpha(j))^2/4*C_Nalpha*alpha/2.*(1+sqrt(x10)).^2/2.*cos(alpha);
+    t7(:,j) = -deg2rad(A_alpha(j))^2/4*eta*C_Nalpha*alpha.^2.*sqrt(x10).*sin(alpha);
+    t8(:,j) = deg2rad(A_alpha(j))*H*k/M*sin(alpha)*sin(phi);
+    
 end
 
 Cl = t1+t2+t3+t4+t5+t6+t7+t8;

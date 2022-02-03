@@ -28,12 +28,12 @@ phi = deg2rad(0); % Phase between the pitching and plunging motions [rad]
 
 % Angle parameters
 N = 200;
-alpha = deg2rad(linspace(0,45,N));
+alpha = deg2rad(linspace(0,45,N)).';
 
 %% Averaged Cl
 
 % State x10 (separation point)
-x10 = separation_point(alpha-H*k*sin(phi),alpha1,S1,S2);
+x10 = separation_point(alpha-H*k*sin(phi),alpha1,S1,S2).';
 
 % State x11 (dCv)
 [oldcols,oldrows] = meshgrid(A_array,alpha_array);
@@ -45,15 +45,13 @@ x11 = interp2(oldcols,oldrows,dCv_alphaA,newcols,newrows);
 Cl = zeros(N,n_A);
 
 for j = 1:n_A
-    for i = 1:N
-        
-        % Averaged lift coefficient
-        Cl(i,j) = x11(i,j)*cos(alpha(i))...
-            +C_Nalpha/2*(alpha(i)-H*k*sin(phi))*((1+sqrt(x10(i)))^2/2*cos(alpha(i))+2*eta*(alpha(i)-H*k*sin(phi))*sqrt(x10(i))*sin(alpha(i)))...
-            -deg2rad(A_alpha(j))^2/4*(x11(i,j)*cos(alpha(i))+sin(alpha(i))/(8*M)+C_Nalpha*alpha(i)/2*(1+sqrt(x10(i)))^2/2*cos(alpha(i))+eta*C_Nalpha*alpha(i)^2*sqrt(x10(i))*sin(alpha(i)))...
-            +deg2rad(A_alpha(j))*H*k/M*sin(alpha(i))*sin(phi);
-        
-    end
+    
+    % Averaged lift coefficient
+    Cl(:,j) = x11(:,j).*cos(alpha)...
+            +C_Nalpha/2*(alpha-H*k*sin(phi)).*((1+sqrt(x10)).^2/2.*cos(alpha)+2*eta*(alpha-H*k*sin(phi)).*sqrt(x10).*sin(alpha))...
+            -deg2rad(A_alpha(j))^2/4*(x11(:,j).*cos(alpha)+sin(alpha)/(8*M)+C_Nalpha*alpha/2.*(1+sqrt(x10)).^2/2.*cos(alpha)+eta*C_Nalpha*alpha.^2.*sqrt(x10).*sin(alpha))...
+            +deg2rad(A_alpha(j))*H*k/M*sin(alpha)*sin(phi);
+    
 end
 
 %% Static value
@@ -68,12 +66,12 @@ plot(alpha_s,Cl_s,'--o');
         plot(rad2deg(alpha),Cl(:,i));
  end
  
- xlabel('\alpha^{*}'); ylabel('$\overline{C}_{L}$','interpreter','latex');
+ xlabel('\alpha^{*}'); ylabel('$\overline{C}_{N}$','interpreter','latex');
  
  Legend = cell(n_A+1,1);
 for iter = 1:n_A+1
     if iter==1
-        Legend{iter} = strcat('Steady Cl');
+        Legend{iter} = strcat('Steady Cn');
     else
         Legend{iter} = strcat('A_{\alpha}=', num2str((iter-2)), 'º');
     end

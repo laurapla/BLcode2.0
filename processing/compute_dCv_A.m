@@ -42,7 +42,7 @@ N = n_cycles*n_t;
 t = linspace(0,n_cycles*T,N); % Time vector [s]
 s = V*t/b; % Non-dimensional time vector
 
-n_A = 15;
+n_A = 11;
 n_alpha = 20;
 A_array = linspace(0,10,n_A);
 dCv_matrix = zeros(n_t+1,n_alpha,n_A);
@@ -62,6 +62,7 @@ for index = 1:n_A
     
     % Beddoes-Leishman Model
     
+    % Mean angle of attack
     alpha_array = linspace(0,pi/4,n_alpha);
     
     for j = 1:n_alpha
@@ -73,19 +74,23 @@ for index = 1:n_A
         % Effective angle of attack [rad]
         alpha_eff = alpha+atan(dh/V);
         
+        
         % Attached flow
         
         q = dalpha*c/V; % Non-dimensional pitch rate
         
         [Cnp, Cmp, Ccp, alpha_E, Cni] = BL_attached(t,alpha_eff,q,V,M,c,e,C_Nalpha,alpha0,Cm0,x_ac);
         
+        
         % Stall onset
         
         Cnprime = BL_stallonset(s,T_P,C_Nalpha*alpha_E,Cnp);
         
+        
         % Trailing edge separation
         
         [Cnf, Cmf, Ccf, fprimeprime, fprime] = BL_TEseparation(s,Cnprime,C_Nalpha,C_N1,alpha0,alpha_eff,alpha_E,alpha1,dalpha1,S1,S2,T_f,T_vl,K0,K1,K2,eta,D_f);
+        
         
         % Modeling of dynamic stall
         
@@ -127,14 +132,14 @@ for index = 1:n_A
     
 end
 
-filename = 'dCv_A';
+filename = ['dCv_A_k',num2str(100*k)];
 save(filename,'A_array','dCv_matrix','t');
 
 %% Processing
 
 % Storing the results
 dCv = zeros(n_alpha,n_A);
-interval = 1;
+interval = 2;
 
 for j = 1:n_A
     
@@ -153,19 +158,19 @@ end
 
 %% Plot parameters
 
-Legend = cell(floor(n_A/interval)+1,1);
-for iter=1:n_A-1
-    if rem(A_array(j),interval)==0
-        Legend{(floor(iter/interval)+1)} = strcat('A_{\alpha}=', num2str((A_array(iter))), 'º');
+Legend = cell(floor(n_A/interval),1);
+for iter=1:n_A
+    if rem(A_array(iter),interval)==0
+        Legend{(ceil(iter/interval))} = strcat('A_{\alpha}=', num2str((A_array(iter))), 'º');
     end
 end
-legend(Legend,'Location','best')
+legend(Legend,'Location','northwest')
 
 xlabel('\alpha [º]'); ylabel('$\dot{C}_{v}^{*}$','interpreter','latex');
 
 %% Plot as a function of the parameter
 
-interval_angle = 15;
+interval_angle = 1;
 fffit = zeros(3,floor(n_alpha/interval_angle));
 
 figure(2);
@@ -184,7 +189,7 @@ for iter = 1:n_alpha
         Legend2{(iter-1)/interval_angle+1} = strcat('\alpha^{*}=', num2str(round(rad2deg(alpha_array(iter)))), 'º');
     end
 end
-legend(Legend2,'Location','bestoutside')
+legend(Legend2,'Location','bestoutside','NumColumns',2)
 
 xlabel('A_{\alpha} [º]');
 
