@@ -8,4 +8,8 @@ Laura Pla Olea - University of California, Irvine
 
 ## Copyright
 
-No distribution and attribution
+@author Laura Pla Olea
+Copyright 2021
+
+All rights reserved.
+Distribution of the software in any form is only allowed with explicit, prior permission from the owner.
