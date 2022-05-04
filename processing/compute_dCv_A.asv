@@ -1,6 +1,6 @@
 % Simulation of the Beddoes-Leishman State Space Model (NACA0012) to find
 % the value of dCv as a function of time and alphabase
-% University of California, Irvine - Winter 2022
+% University of California, Irvine - Fall 2021
 % Laura Pla Olea - lplaolea@uci.edu
 
 clear; clc; close all
@@ -13,13 +13,13 @@ airfoil = ('NACA0012');
 c = 1; % Airfoil chord [m]
 e = -1/2*1/2; % Pitching axis (measured from the midchord) normalized by the chord
 M = 0.3; % Mach number
-k = 0.5; % Reduced frequency
+k = 0.1; % Reduced frequency
 n_cycles = 10; % Number of cycles that are computed
 n_t = 1e2; % Number of time steps per cycle
 
 % Environment
 gamma = 1.4; % Heat capacity ratio / Adiabatic index
-R = 287.058; % Specific gas constant for dry air [J/kg·K]
+R = 287.058; % Specific gas constant for dry air [J/kgÂ·K]
 Ta = 298; % Ambient temperature [K]
 
 % Numerical values
@@ -42,16 +42,16 @@ N = n_cycles*n_t;
 t = linspace(0,n_cycles*T,N); % Time vector [s]
 s = V*t/b; % Non-dimensional time vector
 
-n_A = 12;
+n_A = 11;
 n_alpha = 20;
-H_array = linspace(0,0.55,n_A);
+A_array = linspace(0,10,n_A);
 dCv_matrix = zeros(n_t+1,n_alpha,n_A);
 
 for index = 1:n_A
     
     % Motion
-    A_alpha = deg2rad(0); % Pitching amplitude [rad]
-    H = H_array(index); % Plunging amplitude (h/c)
+    A_alpha = deg2rad(A_array(index+1)); % Pitching amplitude [rad]
+    H = 0; % Plunging amplitude (h/c)
     phi = deg2rad(0); % Phase between the pitching and plunging motions [rad]
     
     % Pitching motion [rad]
@@ -68,7 +68,7 @@ for index = 1:n_A
     for j = 1:n_alpha
         
         % Pitching motion [rad]
-        alphabase = alpha_array(j);
+        alphabase = alpha_array(j+8);
         alpha = alphabase-A_alpha*cos(w*t);
         
         % Effective angle of attack [rad]
@@ -103,7 +103,7 @@ for index = 1:n_A
         N = size(s,2);
         
         Cv = zeros(1,N);
-        Ds = zeros(1,N);
+        Cnv = zeros(1,N);
         
         for j_index = 2:N
             
@@ -123,26 +123,17 @@ for index = 1:n_A
             end
             
             Cv(j_index) = Ds(j_index)*Cnc(j_index)*(1-Kn(j_index));
-
-            Ds2 = Ds;
-            if Ds(j_index)==1 && Ds(j_index-1)==0
-                Ds2(j_index)=0;
-            elseif j_index<N
-                if Ds(j_index)==1 && Ds(j_index+1)==0
-                    Ds2(j_index)=0;
-                end
-            end
             
         end
         
-        dCv_matrix(:,j,index) = Ds2(N-n_t:N).*gradient(Cv(N-n_t:N))./gradient(t(N-n_t:N));
+        dCv_matrix(:,j,index) = Ds.*gradient(Cv(N-n_t:N))./gradient(t(N-n_t:N));
         
     end
     
 end
 
-filename = ['dCv_H_k',num2str(100*k)];
-save(filename,'H_array','dCv_matrix','t');
+filename = ['dCv_A_k',num2str(100*k)];
+save(filename,'A_array','dCv_matrix','t');
 
 %% Processing
 
@@ -158,7 +149,7 @@ for j = 1:n_A
     dCv(:,j) = mean(dCv_array);
     dCv(isinf(dCv)|isnan(dCv)) = 0;
     
-    if rem(round(H_array(j)),interval)==0
+    if rem(round(A_array(j)),interval)==0
         hold on;
         plot(rad2deg(alpha_array),dCv(:,j))
     end
@@ -169,37 +160,37 @@ end
 
 Legend = cell(floor(n_A/interval),1);
 for iter=1:n_A
-    if rem(100*H_array(iter),interval)<=1e-5
-        Legend{(ceil(iter/interval))} = strcat('H=', num2str((H_array(iter))));
+    if rem(A_array(iter),interval)==0
+        Legend{(ceil(iter/interval))} = strcat('A_{\alpha}=', num2str((A_array(iter))), 'Âº');
     end
 end
 legend(Legend,'Location','northwest')
 
-xlabel('\alpha [º]'); ylabel('$\dot{C}_{v}^{*}$','interpreter','latex');
+xlabel('\alpha [Âº]'); ylabel('$\dot{C}_{v}^{*}$','interpreter','latex');
 
-% %% Plot as a function of the parameter
-% 
-% interval_angle = 1;
-% fffit = zeros(3,floor(n_alpha/interval_angle));
-% 
-% figure(2);
-% for j = 1:n_alpha
-%     f = fit(H_array.',dCv(j,:).','poly2');
-%     fffit(:,j) = coeffvalues(f);
-%     if rem(j-1,interval_angle)==0
-%         hold on;
-%         plot(H_array,dCv(j,:));
-%     end
-% end
-% 
-% Legend2 = cell(floor(n_alpha/interval_angle),1);
-% for iter = 1:n_alpha
-%     if rem(iter-1,interval_angle)==0
-%         Legend2{(iter-1)/interval_angle+1} = strcat('\alpha^{*}=', num2str(round(rad2deg(alpha_array(iter)))), 'º');
-%     end
-% end
-% legend(Legend2,'Location','bestoutside','NumColumns',2)
-% 
-% xlabel('H');
-% 
-% ylabel('$\dot{C}_{v}^{*}$','interpreter','latex');
+%% Plot as a function of the parameter
+
+interval_angle = 1;
+fffit = zeros(3,floor(n_alpha/interval_angle));
+
+figure(2);
+for j = 1:n_alpha
+    f = fit(A_array.',dCv(j,:).','poly2');
+    fffit(:,j) = coeffvalues(f);
+    if rem(j-1,interval_angle)==0
+        hold on;
+        plot(A_array,dCv(j,:));
+    end
+end
+
+Legend2 = cell(floor(n_alpha/interval_angle),1);
+for iter = 1:n_alpha
+    if rem(iter-1,interval_angle)==0
+        Legend2{(iter-1)/interval_angle+1} = strcat('\alpha^{*}=', num2str(round(rad2deg(alpha_array(iter)))), 'Âº');
+    end
+end
+legend(Legend2,'Location','bestoutside','NumColumns',2)
+
+xlabel('A_{\alpha} [Âº]');
+
+ylabel('$\dot{C}_{v}^{*}$','interpreter','latex');

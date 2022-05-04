@@ -13,7 +13,7 @@ airfoil = ('NACA0012');
 c = 1; % Airfoil chord [m]
 e = -1/2*1/2; % Pitching axis (measured from the midchord) normalized by the chord
 M = 0.3; % Mach number
-k = 0.1; % Reduced frequency
+k = 0.5; % Reduced frequency
 n_cycles = 10; % Number of cycles that are computed
 n_t = 1e2; % Number of time steps per cycle
 
@@ -103,7 +103,7 @@ for index = 1:n_A
         N = size(s,2);
         
         Cv = zeros(1,N);
-        Cnv = zeros(1,N);
+        Ds = zeros(1,N);
         
         for j_index = 2:N
             
@@ -113,20 +113,29 @@ for index = 1:n_A
             sigma = sigma2(tauv(j_index), T_vl, Sa, df);
             
             if tauv(j_index)>0 && tauv(j_index)<=T_vl
-                Ds = 1;
+                Ds(j_index) = 1;
             elseif abs(Cnprime(j_index))<C_N1 && df<0
-                Ds = 1;
+                Ds(j_index) = 1;
             elseif Sa>0 && df>0
-                Ds = 1;
+                Ds(j_index) = 1;
             else
-                Ds = 0;
+                Ds(j_index) = 0;
             end
             
-            Cv(j_index) = Ds*Cnc(j_index)*(1-Kn(j_index));
+            Cv(j_index) = Ds(j_index)*Cnc(j_index)*(1-Kn(j_index));
+            
+            Ds2 = Ds;
+            if Ds(j_index)==1 && Ds(j_index-1)==0
+                Ds2(j_index)=0;
+            elseif j_index<N
+                if Ds(j_index)==1 && Ds(j_index+1)==0
+                    Ds2(j_index)=0;
+                end
+            end
             
         end
         
-        dCv_matrix(:,j,index) = gradient(Cv(N-n_t:N))./gradient(t(N-n_t:N));
+        dCv_matrix(:,j,index) = Ds2(N-n_t:N).*gradient(Cv(N-n_t:N))./gradient(t(N-n_t:N));
         
     end
     
@@ -168,29 +177,29 @@ legend(Legend,'Location','northwest')
 
 xlabel('\alpha [º]'); ylabel('$\dot{C}_{v}^{*}$','interpreter','latex');
 
-%% Plot as a function of the parameter
-
-interval_angle = 1;
-fffit = zeros(3,floor(n_alpha/interval_angle));
-
-figure(2);
-for j = 1:n_alpha
-    f = fit(A_array.',dCv(j,:).','poly2');
-    fffit(:,j) = coeffvalues(f);
-    if rem(j-1,interval_angle)==0
-        hold on;
-        plot(A_array,dCv(j,:));
-    end
-end
-
-Legend2 = cell(floor(n_alpha/interval_angle),1);
-for iter = 1:n_alpha
-    if rem(iter-1,interval_angle)==0
-        Legend2{(iter-1)/interval_angle+1} = strcat('\alpha^{*}=', num2str(round(rad2deg(alpha_array(iter)))), 'º');
-    end
-end
-legend(Legend2,'Location','bestoutside','NumColumns',2)
-
-xlabel('A_{\alpha} [º]');
-
-ylabel('$\dot{C}_{v}^{*}$','interpreter','latex');
+% %% Plot as a function of the parameter
+% 
+% interval_angle = 1;
+% fffit = zeros(3,floor(n_alpha/interval_angle));
+% 
+% figure(2);
+% for j = 1:n_alpha
+%     f = fit(A_array.',dCv(j,:).','poly2');
+%     fffit(:,j) = coeffvalues(f);
+%     if rem(j-1,interval_angle)==0
+%         hold on;
+%         plot(A_array,dCv(j,:));
+%     end
+% end
+% 
+% Legend2 = cell(floor(n_alpha/interval_angle),1);
+% for iter = 1:n_alpha
+%     if rem(iter-1,interval_angle)==0
+%         Legend2{(iter-1)/interval_angle+1} = strcat('\alpha^{*}=', num2str(round(rad2deg(alpha_array(iter)))), 'º');
+%     end
+% end
+% legend(Legend2,'Location','bestoutside','NumColumns',2)
+% 
+% xlabel('A_{\alpha} [º]');
+% 
+% ylabel('$\dot{C}_{v}^{*}$','interpreter','latex');

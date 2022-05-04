@@ -7,7 +7,7 @@ clear; clc; close all;
 %% Loading files
 
 addpath(genpath('../'),genpath('/data'),genpath('../experimental_data'))
-load('dCv_H.mat');
+load('dCv.mat');
 load('CN_NACA0012_static.mat');
 
 %% Input data
@@ -30,17 +30,30 @@ phi = deg2rad(0); % Phase between the pitching and plunging motions [rad]
 N = 200;
 alpha = deg2rad(linspace(0,45,N));
 
-%% Averaged Cl
+%% dCv_matrix processing
 
-% State x11 (dCv)
+n_H_array = length(H_array);
+n_k_array = length(k_array);
+n_alpha_array = length(alpha_array);
+
+k_index = 1;
+for i = 2:n_k_array
+    if abs(k-k_array(i))<abs(k-k_array(i-1))
+        k_index = i;
+    end
+end
+
+%% State x11 (dCv)
+
 [oldcols,oldrows] = meshgrid(H_array,alpha_array);
 [newcols, newrows] = meshgrid(H,alpha);
-x11 = interp2(oldcols,oldrows,dCv,newcols,newrows);
+x11 = interp2(oldcols,oldrows,dCv_H(:,:,k_index),newcols,newrows);
 
-%% Averaged Cl
+%% Average Cl
 
-Cl = zeros(N,n_H);
 x10 = zeros(1,N);
+Cl = zeros(N,n_H);
+Cd = zeros(N,n_H);
 
 for j = 1:n_H
     for i = 1:N
@@ -53,47 +66,58 @@ for j = 1:n_H
             +C_Nalpha/2*(alpha(i)-H(j)*k*sin(phi))*((1+sqrt(x10(i)))^2/2*cos(alpha(i))+2*eta*(alpha(i)-H(j)*k*sin(phi))*sqrt(x10(i))*sin(alpha(i)))...
             -deg2rad(A_alpha)^2/4*(x11(i,j)*cos(alpha(i))+sin(alpha(i))/(8*M)+C_Nalpha*alpha(i)/2*(1+sqrt(x10(i)))^2/2*cos(alpha(i))+eta*C_Nalpha*alpha(i)^2*sqrt(x10(i))*sin(alpha(i)))...
             +deg2rad(A_alpha)*H(j)*k/M*sin(alpha(i))*sin(phi);
-        
+
+        % Averaged drag coefficient
+        Cd(i,j) = x11(i,j).*sin(alpha(i))...
+            +C_Nalpha/2*((i)-H(j)*k*sin(phi)).*((1+sqrt(x10(i))).^2/2.*sin(alpha(i))-eta*(alpha(i)-H(j)*k*sin(phi)).*sqrt(x10(i)).*cos(alpha(i)))...
+            -deg2rad(A_alpha)^2/4*(x11(i,j).*sin(alpha(i))-8*cos(alpha(i))/M+C_Nalpha*alpha(i)/2.*(1+sqrt(x10(i))).^2/2.*sin(alpha(i))-eta*C_Nalpha*alpha(i).^2.*sqrt(x10(i)).*cos(alpha(i)))...
+            -2*deg2rad(A_alpha)*H(j)*k/M*cos(alpha(i))*sin(phi);
+
     end
 end
 
-%% Static value
+%% Plot Cl
 
-alpha_s = CN_NACA0012_static(:,1);
-Cl_s = CN_NACA0012_static(:,2);
+line_width = 1.7;
+font_lgd = 10;
+font_labels = 14;
+
+symbols = {'-', '--', ':','-.','-', '--', ':','-.','-', '--', ':','-.','-', '--', ':','-.','-', '--', ':','-.'};
+Okabe_Ito = [0.902 0.624 0; 0.337 0.737 0.914; 0 0.62 0.451;
+    0.941 0.894 0.259; 0 0.447 0.698; 0.835 0.369 0; 0.8 0.475 0.655];
 
 figure;
-plot(alpha_s,Cl_s);
+colororder(Okabe_Ito)
 for i = 1:n_H
     hold on;
-    plot(rad2deg(alpha),Cl(:,i));
+    plot(rad2deg(alpha),Cl(:,i),symbols{i},'LineWidth',line_width);
 end
 
-xlabel('\alpha^{*}'); ylabel('$\overline{C}_{L}$','interpreter','latex');
+xlabel('$\alpha^{*}$','interpreter','latex','FontSize',font_labels);
+ylabel('$\overline{C}_{L}$','interpreter','latex','FontSize',font_labels);
 
-Legend = cell(n_H+1,1);
-for iter = 1:n_H+1
-    if iter==1
-        Legend{iter} = strcat('Steady Cl');
-    else
-        Legend{iter} = strcat('H=', num2str(5*(iter-2)/100));
-    end
+Legend = cell(n_H,1);
+for iter = 1:n_H
+    Legend{iter} = strcat('$H=$', num2str(5*(iter-1)/100));
 end
-legend(Legend,'Location','bestoutside')
-xlim([0 25])
-ylim([0 1.6])
+legend(Legend,'Location','best','interpreter','latex','FontSize',font_lgd)
+grid on;
 
-%%
-
-Cl35 = [Cl(1:74,8); Cl(76:end,8)]; a35 = [alpha(1:74) alpha(76:end)];
-Cl50 = [Cl(1:75,11); Cl(79:end,11)]; a50 = [alpha(1:75) alpha(79:end)];
+%% Plot Cd
 
 figure;
-plot(alpha_s,Cl_s,'--o');
-hold on; plot(rad2deg(alpha),Cl(:,3));
-hold on; plot(rad2deg(a35),Cl35);
-hold on; plot(rad2deg(a50),Cl50);
-xlim([0 25])
-xlabel('\alpha^*'); ylabel('$\overline{C}_{L}$','interpreter','latex');
-grid on
-legend('Steady C_{L}','H=0.1','H=0.35','H=0.5','Location','southeast')
+colororder(Okabe_Ito)
+for i = 1:n_H
+    hold on;
+    plot(rad2deg(alpha),Cd(:,i),symbols{i},'LineWidth',line_width);
+end
+
+xlabel('$\alpha^{*}, ^{\circ}$','interpreter','latex','FontSize',font_labels);
+ylabel('$\overline{C}_{D}$','interpreter','latex','FontSize',font_labels);
+
+Legend = cell(n_H,1);
+for iter = 1:n_H
+    Legend{iter} = strcat('$H=$', num2str(H_array(iter)));
+end
+legend(Legend,'Location','best','interpreter','latex','FontSize',font_lgd)
+grid on;
