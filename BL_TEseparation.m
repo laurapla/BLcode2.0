@@ -26,8 +26,6 @@ alpha_f = Cnprime./C_Nalpha+alpha0;
 
 tauv = vortex_time(Cnprime,s_span,C_N1);
 
-tolerance = 2e-4;
-
 N = size(s_span,2);
 Df = zeros(1,N);
 fprime = ones(1,N);
@@ -35,6 +33,7 @@ fprimeprime = ones(1,N);
 Dfr = zeros(1,N);
 fM = ones(1,N);
 fr = ones(1,N);
+counter = 0;
 
 for i = 2:N
     
@@ -57,6 +56,7 @@ for i = 2:N
     end
     
     fprimeprime_ant = 0.8*fprimeprime(i-1); fr_ant = 0.8*fr(i-1); resta = 100;
+    tolerance = 1e-6;
     while resta>tolerance
         
         [sigma1, sigma3] = sigma13(Cnprime(i), C_N1, Sa, fprimeprime_ant-fprimeprime(i-1), fprimeprime_ant, fr_ant, tauv(i), T_vl);
@@ -75,8 +75,14 @@ for i = 2:N
         resta = abs(fprimeprime(i)-fprimeprime_ant);
         fprimeprime_ant = fprimeprime(i);
         fr_ant = fr(i);
+        counter = counter+1;
+        
+        if counter>1e6
+            tolerance = tolerance+2*10^floor(log(abs(tolerance))./log(10));
+        end
         
     end
+    
     
 end
 
