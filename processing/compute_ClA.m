@@ -7,19 +7,24 @@ clear; clc; close all;
 %% Loading files
 
 addpath(genpath('../'),genpath('/data'),genpath('../experimental_data'))
-load('dCv.mat');
+load('dCvM0.7.mat');
 load('CN_NACA0012_static.mat');
 
 %% Input data
 
 % Geometry
 airfoil = ('NACA0012');
-M = 0.3; % Mach number
+M = 0.7; % Mach number
 k = 0.1; % Reduced frequency
 
+%% Pre-calculations
+
+n_A_array = length(A_array);
+n_k_array = length(k_array);
+n_alpha_array = length(alpha_array);
+
 % Motion
-n_A = 11;
-A_alpha = linspace(0,10,n_A); % Pitching amplitude [rad]
+A_alpha = linspace(0,10,n_A_array); % Pitching amplitude [rad]
 H = 0; % Plunging amplitude (h/c)
 phi = deg2rad(0); % Phase between the pitching and plunging motions [rad]
 
@@ -31,10 +36,6 @@ N = 200;
 alpha = deg2rad(linspace(0,45,N)).';
 
 %% dCv_matrix processing
-
-n_A_array = length(A_array);
-n_k_array = length(k_array);
-n_alpha_array = length(alpha_array);
 
 k_index = 1;
 for i = 2:n_k_array
@@ -55,10 +56,10 @@ x11 = interp2(oldcols,oldrows,dCv_A(:,:,k_index),newcols,newrows);
 
 %% Averaged Cl and Cd
 
-Cl = zeros(N,n_A);
-Cd = zeros(N,n_A);
+Cl = zeros(N,n_A_array);
+Cd = zeros(N,n_A_array);
 
-for j = 1:n_A
+for j = 1:n_A_array
     
     % Averaged lift coefficient
     Cl(:,j) = x11(:,j).*cos(alpha)...
@@ -79,6 +80,7 @@ end
 line_width = 1.7;
 font_lgd = 10;
 font_labels = 14;
+inter = 2;
 
 symbols = {'-', '--', ':','-.','-', '--', ':','-.','-', '--', ':','-.','-', '--', ':','-.','-', '--', ':','-.'};
 Okabe_Ito = [0.902 0.624 0; 0.337 0.737 0.914; 0 0.62 0.451;
@@ -86,17 +88,23 @@ Okabe_Ito = [0.902 0.624 0; 0.337 0.737 0.914; 0 0.62 0.451;
 
 figure;
 colororder(Okabe_Ito)
-for i = 1:n_A
-    plot(rad2deg(alpha),Cl(:,i),symbols{i},'LineWidth',line_width);
+for i = 1:n_A_array
+    if i==1
+        plot(rad2deg(alpha),Cl(:,i),'k','LineWidth',line_width);
+    elseif rem(A_array(i),inter)==0
+        plot(rad2deg(alpha),Cl(:,i),symbols{floor(i/inter)+1},'LineWidth',line_width);
+    end
     hold on;
 end
 
 xlabel('$\alpha^{*}, ^{\circ}$','interpreter','latex','FontSize',font_labels);
 ylabel('$\overline{C}_{L}$','interpreter','latex','FontSize',font_labels);
 
-Legend = cell(n_A,1);
-for iter = 1:n_A
-    Legend{iter} = strcat('$A_{\alpha}=$', num2str((iter-1)), '$^{\circ}$');
+Legend = cell(ceil(n_A_array/inter),1);
+for iter = 1:n_A_array
+    if rem(A_array(iter),inter)==0
+        Legend{ceil(iter/inter)} = strcat('$A_{\alpha}=$', num2str(iter-1), '$^{\circ}$');
+    end
 end
 legend(Legend,'Location','best','interpreter','latex','FontSize',font_lgd)
 grid on;
@@ -105,17 +113,17 @@ grid on;
 
 figure;
 colororder(Okabe_Ito)
-for i = 1:n_A
+for i = 1:n_A_array
+    if i==1
+        plot(rad2deg(alpha),Cd(:,i),'k','LineWidth',line_width);
+    elseif rem(A_array(i),inter)==0
+        plot(rad2deg(alpha),Cd(:,i),symbols{floor(i/inter)+1},'LineWidth',line_width);
+    end
     hold on;
-    plot(rad2deg(alpha),Cd(:,i),symbols{i},'LineWidth',line_width);
 end
 
 xlabel('$\alpha^{*}, ^{\circ}$','interpreter','latex','FontSize',font_labels);
 ylabel('$\overline{C}_{D}$','interpreter','latex','FontSize',font_labels);
 
-Legend = cell(n_A,1);
-for iter = 1:n_A
-    Legend{iter} = strcat('$A_{\alpha}=$', num2str((iter-1)), '$^{\circ}$');
-end
 legend(Legend,'Location','best','interpreter','latex','FontSize',font_lgd)
 grid on;
