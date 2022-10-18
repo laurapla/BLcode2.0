@@ -4,23 +4,26 @@
 
 clear; clc; close all;
 
-%% Loading files
-
-addpath(genpath('../'),genpath('/data'),genpath('../experimental_data'))
-load('dCv.mat');
-load('CN_NACA0012_static.mat');
-
 %% Input data
 
 % Geometry
 airfoil = ('NACA0012');
 M = 0.3; % Mach number
-k = 0.5; % Reduced frequency
+k = 0.1; % Reduced frequency
+
+%% Loading files
+
+addpath(genpath('../'),genpath('/data'),genpath('../experimental_data'))
+load(strcat('dCvM', num2str(M), '.mat'));
+load('CN_NACA0012_static.mat');
+
+%% Pre-calculations
+
+n_H_array = length(H_array);
 
 % Motion
-n_H = 12;
 A_alpha = 0; % Pitching amplitude [rad]
-H = linspace(0,0.55,n_H); % Plunging amplitude (h/c)
+H = linspace(0,0.55,n_H_array); % Plunging amplitude (h/c)
 phi = deg2rad(0); % Phase between the pitching and plunging motions [rad]
 
 % Numerical values
@@ -32,9 +35,7 @@ alpha = deg2rad(linspace(0,45,N));
 
 %% dCv_matrix processing
 
-n_H_array = length(H_array);
 n_k_array = length(k_array);
-n_alpha_array = length(alpha_array);
 
 k_index = 1;
 for i = 2:n_k_array
@@ -52,10 +53,10 @@ x11 = interp2(oldcols,oldrows,dCv_H(:,:,k_index),newcols,newrows);
 %% Average Cl
 
 x10 = zeros(1,N);
-Cl = zeros(N,n_H);
-Cd = zeros(N,n_H);
+Cl = zeros(N,n_H_array);
+Cd = zeros(N,n_H_array);
 
-for j = 1:n_H
+for j = 1:n_H_array
     for i = 1:N
         
         % State x10 (separation point)
@@ -69,7 +70,7 @@ for j = 1:n_H
 
         % Averaged drag coefficient
         Cd(i,j) = x11(i,j).*sin(alpha(i))...
-            +C_Nalpha/2*((i)-H(j)*k*sin(phi)).*((1+sqrt(x10(i))).^2/2.*sin(alpha(i))-eta*(alpha(i)-H(j)*k*sin(phi)).*sqrt(x10(i)).*cos(alpha(i)))...
+            +C_Nalpha/2*(alpha(i)-H(j)*k*sin(phi)).*((1+sqrt(x10(i))).^2/2.*sin(alpha(i))-eta*(alpha(i)-H(j)*k*sin(phi)).*sqrt(x10(i)).*cos(alpha(i)))...
             -deg2rad(A_alpha)^2/4*(x11(i,j).*sin(alpha(i))-8*cos(alpha(i))/M+C_Nalpha*alpha(i)/2.*(1+sqrt(x10(i))).^2/2.*sin(alpha(i))-eta*C_Nalpha*alpha(i).^2.*sqrt(x10(i)).*cos(alpha(i)))...
             -2*deg2rad(A_alpha)*H(j)*k/M*cos(alpha(i))*sin(phi);
 
@@ -81,6 +82,7 @@ end
 line_width = 1.7;
 font_lgd = 10;
 font_labels = 14;
+inter = 2;
 
 symbols = {'-', '--', ':','-.','-', '--', ':','-.','-', '--', ':','-.','-', '--', ':','-.','-', '--', ':','-.'};
 Okabe_Ito = [0.902 0.624 0; 0.337 0.737 0.914; 0 0.62 0.451;
@@ -88,17 +90,25 @@ Okabe_Ito = [0.902 0.624 0; 0.337 0.737 0.914; 0 0.62 0.451;
 
 figure;
 colororder(Okabe_Ito)
-for i = 1:n_H
+for i = 1:n_H_array
+    if i==1
+        plot(rad2deg(alpha),Cl(:,i),'k','LineWidth',line_width);
+    elseif rem(100*H_array(i),inter)<1e-12
+        plot(rad2deg(alpha),Cl(:,i),symbols{floor(i/inter)+1},'LineWidth',line_width);
+    end
     hold on;
-    plot(rad2deg(alpha),Cl(:,i),symbols{i},'LineWidth',line_width);
 end
 
 xlabel('$\alpha^{*}$','interpreter','latex','FontSize',font_labels);
 ylabel('$\overline{C}_{L}$','interpreter','latex','FontSize',font_labels);
 
-Legend = cell(n_H,1);
-for iter = 1:n_H
-    Legend{iter} = strcat('$H=$', num2str(5*(iter-1)/100));
+Legend = cell(ceil(n_H_array/inter),1);
+for iter = 1:n_H_array
+    if H_array(iter)==0
+        Legend{iter} = 'Steady';
+    elseif rem(100*H_array(iter),inter)<1e-12
+        Legend{ceil(iter/inter)} = strcat('$H=$', num2str(5*(iter-1)/100));
+    end
 end
 legend(Legend,'Location','best','interpreter','latex','FontSize',font_lgd)
 grid on;
@@ -107,17 +117,17 @@ grid on;
 
 figure;
 colororder(Okabe_Ito)
-for i = 1:n_H
+for i = 1:n_H_array
+    if i==1
+        plot(rad2deg(alpha),Cd(:,i),'k','LineWidth',line_width);
+    elseif rem(100*H_array(i),inter)<1e-12
+        plot(rad2deg(alpha),Cd(:,i),symbols{floor(i/inter)+1},'LineWidth',line_width);
+    end
     hold on;
-    plot(rad2deg(alpha),Cd(:,i),symbols{i},'LineWidth',line_width);
 end
 
 xlabel('$\alpha^{*}, ^{\circ}$','interpreter','latex','FontSize',font_labels);
 ylabel('$\overline{C}_{D}$','interpreter','latex','FontSize',font_labels);
 
-Legend = cell(n_H,1);
-for iter = 1:n_H
-    Legend{iter} = strcat('$H=$', num2str(H_array(iter)));
-end
 legend(Legend,'Location','best','interpreter','latex','FontSize',font_lgd)
 grid on;

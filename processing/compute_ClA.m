@@ -4,18 +4,18 @@
 
 clear; clc; close all;
 
-%% Loading files
-
-addpath(genpath('../'),genpath('/data'),genpath('../experimental_data'))
-load('dCvM0.7.mat');
-load('CN_NACA0012_static.mat');
-
 %% Input data
 
 % Geometry
 airfoil = ('NACA0012');
-M = 0.7; % Mach number
+M = 0.3; % Mach number
 k = 0.1; % Reduced frequency
+
+%% Loading files
+
+addpath(genpath('../'),genpath('/data'),genpath('../experimental_data'))
+load(strcat('dCvM', num2str(M), '.mat'));
+load('CN_NACA0012_static.mat');
 
 %% Pre-calculations
 
@@ -44,7 +44,7 @@ for i = 2:n_k_array
     end
 end
 
-%% Averaged Cl
+%% States x10 and x11
 
 % State x10 (separation point)
 x10 = separation_point(alpha-H*k*sin(phi),alpha1,S1,S2).';
@@ -54,20 +54,20 @@ x10 = separation_point(alpha-H*k*sin(phi),alpha1,S1,S2).';
 [newcols, newrows] = meshgrid(A_alpha,alpha);
 x11 = interp2(oldcols,oldrows,dCv_A(:,:,k_index),newcols,newrows);
 
-%% Averaged Cl and Cd
+%% Average Cl and Cd
 
 Cl = zeros(N,n_A_array);
 Cd = zeros(N,n_A_array);
 
 for j = 1:n_A_array
     
-    % Averaged lift coefficient
+    % Average lift coefficient
     Cl(:,j) = x11(:,j).*cos(alpha)...
         +C_Nalpha/2*(alpha-H*k*sin(phi)).*((1+sqrt(x10)).^2/2.*cos(alpha)+2*eta*(alpha-H*k*sin(phi)).*sqrt(x10).*sin(alpha))...
         -deg2rad(A_alpha(j))^2/4*(x11(:,j).*cos(alpha)+8*sin(alpha)/M+C_Nalpha*alpha/2.*(1+sqrt(x10)).^2/2.*cos(alpha)+eta*C_Nalpha*alpha.^2.*sqrt(x10).*sin(alpha))...
         +2*deg2rad(A_alpha(j))*H*k/M*sin(alpha)*sin(phi);
 
-    % Averaged drag coefficient
+    % Average drag coefficient
     Cd(:,j) = x11(:,j).*sin(alpha)...
         +C_Nalpha/2*(alpha-H*k*sin(phi)).*((1+sqrt(x10)).^2/2.*sin(alpha)-eta*(alpha-H*k*sin(phi)).*sqrt(x10).*cos(alpha))...
         -deg2rad(A_alpha(j))^2/4*(x11(:,j).*sin(alpha)-8*cos(alpha)/M+C_Nalpha*alpha/2.*(1+sqrt(x10)).^2/2.*sin(alpha)-eta*C_Nalpha*alpha.^2.*sqrt(x10).*cos(alpha))...
@@ -102,7 +102,9 @@ ylabel('$\overline{C}_{L}$','interpreter','latex','FontSize',font_labels);
 
 Legend = cell(ceil(n_A_array/inter),1);
 for iter = 1:n_A_array
-    if rem(A_array(iter),inter)==0
+    if A_array(iter)==0
+        Legend{iter} = 'Steady';
+    elseif rem(A_array(iter),inter)==0
         Legend{ceil(iter/inter)} = strcat('$A_{\alpha}=$', num2str(iter-1), '$^{\circ}$');
     end
 end
