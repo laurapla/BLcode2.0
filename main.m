@@ -80,12 +80,17 @@ Cnprime = BL_stallonset(s,T_P,C_Nalpha*alpha_E,Cnp);
 CN = Cnf+Cnv+Cni;
 CM = Cmf+Cmv+Cmp-K0*C_Nalpha*alpha_E;
 
+lwidth = 1.7;
+lbl_font = 14;
+lgd_font = 14;
+ax_font = 12;
+
 figure(1);
-plot(rad2deg(alpha_eff(N-n_t:N)),Cnp(N-n_t:N),rad2deg(alpha_eff(N-n_t:N)),Cnf(N-n_t:N),rad2deg(alpha_eff(N-n_t:N)),Cnv(N-n_t:N));
-xlabel('\alpha [º]'); legend('C_{N}^{p}','C_{N}^{f}','C_{N}^{v}','Location','Northwest');
-% axis ([-10 20 -1 2]);
+plot(rad2deg(alpha_eff(N-n_t:N)),Cnp(N-n_t:N),rad2deg(alpha_eff(N-n_t:N)),Cnf(N-n_t:N),rad2deg(alpha_eff(N-n_t:N)),Cnv(N-n_t:N),'LineWidth',lwidth);
+xlabel('$\alpha, ^{\circ}$','Interpreter','latex','FontSize',lbl_font);
+legend('$C_{N}^{p}$','$C_{N}^{f}$','$C_{N}^{v}$','Location','Northwest','Interpreter','latex','FontSize',lgd_font);
 grid on
-title([airfoil,', k=',num2str(k),', $\alpha=',num2str(rad2deg(alphabase)),'^{o}+',num2str(rad2deg(A_alpha)),'^{o}sin(\omega t)$'],'interpreter','latex');
+title([airfoil,', $k=',num2str(k),'$, $\alpha=',num2str(rad2deg(alphabase)),'^{o}+',num2str(rad2deg(A_alpha)),'^{o}sin(\omega t)$'],'interpreter','latex');
 
 % Lift & Drag coefficients
 CL = CN.*cos(alpha_eff)+Ccf.*sin(alpha_eff);
@@ -95,30 +100,34 @@ CD = CN.*sin(alpha_eff)-Ccf.*cos(alpha_eff)+Cd0;
 [alpha_el,CN_e,alpha_ed,CD_e,alpha_em,CM_e] = experimental_results(airfoil,k,M,alphabase,A_alpha,H,phi);
 
 figure(2);
-plot(rad2deg(alpha_eff(N-n_t:N)),CN(N-n_t:N),'r')
-xlabel('\alpha [º]'); ylabel('C_{N}');
+plot(rad2deg(alpha_eff(N-n_t:N)),CN(N-n_t:N),'r','LineWidth',lwidth)
+xlabel('$\alpha, ^{\circ}$','Interpreter','latex','FontSize',lbl_font);
+ylabel('$C_{L}$','Interpreter','latex','FontSize',lbl_font);
 grid on
-hold on; plot(alpha_el,CN_e,'--')
-hold on; plot(alpha_el,CN_e,'o')
-legend('Model','Experimental','Location','best');
+hold on; plot(alpha_el,CN_e,'--o','LineWidth',lwidth,'Color',[0.9290 0.6940 0.1250])
+legend('Model','Experimental','Location','best','FontSize',lgd_font);
 title([airfoil,', k=',num2str(k),', $\alpha=',num2str(rad2deg(alphabase)),'^{o}+',num2str(rad2deg(A_alpha)),'^{o}sin(\omega t)$'],'interpreter','latex');
+ax = gca;
+ax.FontSize = ax_font;
 
 figure(3);
-plot(rad2deg(alpha_eff(N-n_t:N)),CD(N-n_t:N),'r')
+plot(rad2deg(alpha_eff(N-n_t:N)),CD(N-n_t:N),'r','LineWidth',lwidth)
 grid on
-hold on; plot(alpha_ed,CD_e,'--')
-hold on; plot(alpha_ed,CD_e,'o')
-legend('Model','Experimental','Location','best')
-xlabel('\alpha [º]');
-ylabel('C_{D}');
+hold on; plot(alpha_ed,CD_e,'--o','LineWidth',lwidth,'Color',[0.9290 0.6940 0.1250])
+legend('Model','Experimental','Location','best','FontSize',lgd_font)
+xlabel('$\alpha, ^{\circ}$','Interpreter','latex','FontSize',lbl_font);
+ylabel('$C_{D}$','Interpreter','latex','FontSize',lbl_font);
 title([airfoil,', k=',num2str(k),', $\alpha=',num2str(rad2deg(alphabase)),'^{o}+',num2str(rad2deg(A_alpha)),'^{o}sin(\omega t)$'],'interpreter','latex');
+ax = gca; % current axes
+ax.FontSize = ax_font;
 
 figure(4);
-plot(rad2deg(alpha_eff(N-n_t:N)),CM(N-n_t:N),'r')
+plot(rad2deg(alpha_eff(N-n_t:N)),CM(N-n_t:N),'r','LineWidth',lwidth)
 grid on
-hold on; plot(alpha_em,CM_e,'--')
-hold on; plot(alpha_em,CM_e,'o')
-legend('Model','Experimental','Location','best')
-xlabel('\alpha [º]');
-ylabel('C_{M}');
+hold on; plot(alpha_em,CM_e,'--o','LineWidth',lwidth,'Color',[0.9290 0.6940 0.1250])
+legend('Model','Experimental','Location','best','FontSize',lgd_font)
+xlabel('$\alpha, ^{\circ}$','Interpreter','latex','FontSize',lbl_font);
+ylabel('$C_{M}$','Interpreter','latex','FontSize',lbl_font);
 title([airfoil,', k=',num2str(k),', $\alpha=',num2str(rad2deg(alphabase)),'^{o}+',num2str(rad2deg(A_alpha)),'^{o}sin(\omega t)$'],'interpreter','latex');
+ax = gca; % current axes
+ax.FontSize = ax_font;
