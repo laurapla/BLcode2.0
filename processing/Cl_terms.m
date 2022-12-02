@@ -56,64 +56,94 @@ x11 = interp2(oldcols,oldrows,dCv_A(:,:,k_index),newcols,newrows);
 
 %% Average Cl
 
-t1 = zeros(N,n_A_array);
-t2 = zeros(N,n_A_array);
-t3 = zeros(N,n_A_array);
-t4 = zeros(N,n_A_array);
-t5 = zeros(N,n_A_array);
-t6 = zeros(N,n_A_array);
-t7 = zeros(N,n_A_array);
-t8 = zeros(N,n_A_array);
+term = zeros(N,n_A_array,8);
 
 for j = 1:n_A_array
     
     % Averaged lift coefficient
-    t1(:,j) = x11(:,j).*cos(alpha);
-    t2(:,j) = C_Nalpha/2*(alpha-H*k*sin(phi)).*(1+sqrt(x10)).^2/2.*cos(alpha);
-    t3(:,j) = C_Nalpha/2*(alpha-H*k*sin(phi))*2*eta.*(alpha-H*k*sin(phi)).*sqrt(x10).*sin(alpha);
-    t4(:,j) = -deg2rad(A_alpha(j))^2/4*x11(:,j).*cos(alpha);
-    t5(:,j) = -deg2rad(A_alpha(j))^2/4*8*sin(alpha)/M;
-    t6(:,j) = -deg2rad(A_alpha(j))^2/4*C_Nalpha*alpha/2.*(1+sqrt(x10)).^2/2.*cos(alpha);
-    t7(:,j) = -deg2rad(A_alpha(j))^2/4*eta*C_Nalpha*alpha.^2.*sqrt(x10).*sin(alpha);
-    t8(:,j) = 2*deg2rad(A_alpha(j))*H*k/M*sin(alpha)*sin(phi);
+    term(:,j,1) = x11(:,j).*cos(alpha);
+    term(:,j,2) = C_Nalpha/2*(alpha-H*k*sin(phi)).*(1+sqrt(x10)).^2/2.*cos(alpha);
+    term(:,j,3) = C_Nalpha/2*(alpha-H*k*sin(phi))*2*eta.*(alpha-H*k*sin(phi)).*sqrt(x10).*sin(alpha);
+    term(:,j,4) = -deg2rad(A_alpha(j))^2/4*x11(:,j).*cos(alpha);
+    term(:,j,5) = -deg2rad(A_alpha(j))^2/4*8*sin(alpha)/M;
+    term(:,j,6) = -deg2rad(A_alpha(j))^2/4*C_Nalpha*alpha/2.*(1+sqrt(x10)).^2/2.*cos(alpha);
+    term(:,j,7) = -deg2rad(A_alpha(j))^2/4*eta*C_Nalpha*alpha.^2.*sqrt(x10).*sin(alpha);
+    term(:,j,8) = 2*deg2rad(A_alpha(j))*H*k/M*sin(alpha)*sin(phi);
     
 end
 
-Cl = t1+t2+t3+t4+t5+t6+t7+t8;
+Cl = zeros(N,n_A_array);
+for i = 1:8
+    Cl = Cl+term(:,:,i);
+end
 
 %% Static value
 
 alpha_s = CN_NACA0012_static(:,1);
 Cl_s = CN_NACA0012_static(:,2);
 
+line_width = 1.7;
+font_lgd = 10;
+font_labels = 14;
+inter = 2;
+
+symbols = {'-', '--', ':','-.','-', '--', ':','-.','-', '--', ':','-.','-', '--', ':','-.','-', '--', ':','-.'};
+Okabe_Ito = [0.902 0.624 0; 0.337 0.737 0.914; 0 0.62 0.451;
+    0.941 0.894 0.259; 0 0.447 0.698; 0.835 0.369 0; 0.8 0.475 0.655];
+
 figure;
-plot(alpha_s,Cl_s,'--o');
-for i = 1:8
+colororder(Okabe_Ito)
+plot(alpha_s,Cl_s,'--ko','LineWidth',line_width);
+hold on;
+for i = 1:n_A_array
+    if i==1
+        plot(rad2deg(alpha),Cl(:,i),'k','LineWidth',line_width);
+    elseif rem(A_array(i),inter)==0
+        plot(rad2deg(alpha),Cl(:,i),symbols{floor(i/inter)+1},'LineWidth',line_width);
+    end
     hold on;
-    plot(rad2deg(alpha),Cl(:,i));
 end
 
-xlabel('\alpha^{*}'); ylabel('$\overline{C}_{L}$','interpreter','latex');
+xlabel('$\alpha^{*}, ^{\circ}$','interpreter','latex','FontSize',font_labels);
+ylabel('$\overline{C}_{L}$','interpreter','latex','FontSize',font_labels);
+xlim([0 max(rad2deg(alpha))]);
+ylim([0 3])
 
-Legend = cell(8,1);
-for iter = 1:8+1
-    if iter==1
-        Legend{iter} = strcat('Steady Cl');
-    else
-        Legend{iter} = strcat('A_{\alpha}=', num2str((iter-2)), 'º');
+Legend = cell(ceil(n_A_array/inter)+1,1);
+Legend{1} = 'Steady - Experimental';
+for iter = 1:n_A_array
+    if A_array(iter)==0
+        Legend{iter+1} = 'Steady - Beddoes-Leishman';
+    elseif rem(A_array(iter),inter)==0
+        Legend{ceil(iter/inter)+1} = strcat('$A_{\alpha}=$', num2str(iter-1), '$^{\circ}$');
     end
 end
-legend(Legend,'Location','bestoutside')
-grid on; grid minor
+legend(Legend,'Location','best','interpreter','latex','FontSize',font_lgd)
+grid on;
 
 %% Terms
 
 index = 6;
+
 figure;
-plot(rad2deg(alpha),t1(:,index),rad2deg(alpha),t2(:,index),rad2deg(alpha),t3(:,index),rad2deg(alpha),t4(:,index),rad2deg(alpha),t5(:,index),rad2deg(alpha),t6(:,index),rad2deg(alpha),t7(:,index),rad2deg(alpha),t8(:,index));
+colororder(Okabe_Ito)
+for i = 1:8
+    if i==1
+        plot(rad2deg(alpha),term(:,index,i),'k','LineWidth',line_width);
+    else
+        plot(rad2deg(alpha),term(:,index,i),symbols{i},'LineWidth',line_width);
+    end
+    hold on;
+end
+
+xlabel('$\alpha^{*}, ^{\circ}$','interpreter','latex','FontSize',font_labels);
+ylabel('$\overline{C}_{L}$','interpreter','latex','FontSize',font_labels);
+
 legend('$x_{11}^{*}\cos\alpha^{*}$','$C_{N_{\alpha}}(\alpha^{*}-Hbk\sin\phi)(1+\sqrt{x_{10}^{*}})^2\cos\alpha^{*}/4$'...
     ,'$\eta C_{N_{\alpha}}(\alpha^{*}-Hbk\sin\phi)^2\sqrt{x_{10}^{*}}\sin\alpha^{*}$'...
     ,'$-A_{\alpha}^{2}x_{11}^{*}\cos\alpha^{*}/4$','$-2A_{\alpha}^{2}\sin\alpha^{*}/M$'...
     ,'$-A_{\alpha}^{2}C_{N_{\alpha}}\alpha^{*}(1+\sqrt{x_{10}^{*}})^2\cos\alpha^{*}/16$'...
     ,'$-A_{\alpha}^{2}\eta C_{N_{\alpha}}\alpha^{*2}\sqrt{x_{10}^{*}}\sin\alpha^{*}/4$'...
-    ,'$2A_{\alpha}Hk\sin\alpha^{*}\sin\phi/M$','interpreter','latex')
+    ,'$2A_{\alpha}Hk\sin\alpha^{*}\sin\phi/M$','Location','bestoutside','interpreter','latex','FontSize',font_lgd)
+
+grid on;
