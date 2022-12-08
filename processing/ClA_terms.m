@@ -1,5 +1,5 @@
 %% Separately computing the terms of the lift coefficient averaged over a cycle
-% University of California, Irvine - Fall 2021
+% University of California, Irvine - Fall 2022
 % Laura Pla Olea - lplaolea@uci.edu
 
 clear; clc; close all;
@@ -138,7 +138,8 @@ legend('$\dot{C}_{v}^{*}\cos\alpha^{*}$','$C_{N_{\alpha}}\alpha^{*}(1+\sqrt{x_{0
     ,'$-A_{\alpha}^{2}\dot{C}_{v}^{*}\cos\alpha^{*}/4$','$-2A_{\alpha}^{2}\sin\alpha^{*}/M$'...
     ,'$-A_{\alpha}^{2}C_{N_{\alpha}}\alpha^{*}(1+\sqrt{x_{0}^{*}})^2\cos\alpha^{*}/16$'...
     ,'$-A_{\alpha}^{2}\eta C_{N_{\alpha}}\alpha^{*2}\sqrt{x_{0}^{*}}\sin\alpha^{*}/4$'...
-    ,'Location','bestoutside','interpreter','latex','FontSize',font_lgd)
+    ,'Location','best','interpreter','latex','FontSize',font_lgd,'NumColumns',2)
 
 xlim([0 max(rad2deg(alpha))])
+ylim([-0.5 2])
 grid on;
