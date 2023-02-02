@@ -143,3 +143,27 @@ legend('$\dot{C}_{v}^{*}\cos\alpha^{*}$','$C_{N_{\alpha}}\alpha^{*}(1+\sqrt{x_{0
 xlim([0 max(rad2deg(alpha))])
 ylim([-0.5 2])
 grid on;
+
+%% Grouping the A_alpha terms
+
+figure;
+colororder(Okabe_Ito)
+for i = 1:4
+    if i==4
+        plot(rad2deg(alpha),term(:,index,4)+term(:,index,5)+term(:,index,6)+term(:,index,7),symbols{i},'LineWidth',line_width);
+    else
+        plot(rad2deg(alpha),term(:,index,i),symbols{i},'LineWidth',line_width);
+    end
+    hold on;
+end
+
+xlabel('$\alpha^{*}, ^{\circ}$','interpreter','latex','FontSize',font_labels);
+
+legend('$\dot{C}_{v}^{*}\cos\alpha^{*}$','$C_{N_{\alpha}}\alpha^{*}(1+\sqrt{x_{0}^{*}})^2\cos\alpha^{*}/4$'...
+    ,'$\eta C_{N_{\alpha}}\alpha^{*2}\sqrt{x_{0}^{*}}\sin\alpha^{*}$'...
+    ,'$A_{\alpha}^{2}/4\times\chi_{LA_{\alpha}}$'...
+    ,'Location','best','interpreter','latex','FontSize',font_lgd)
+
+xlim([0 max(rad2deg(alpha))])
+ylim([-0.5 2])
+grid on;
