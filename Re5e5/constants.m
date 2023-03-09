@@ -41,6 +41,7 @@ alpha_linear = alpha(index_alpha_min:index_alpha_max);
 Cn_linear = Cn(index_alpha_min:index_alpha_max);
 Cna_deg = alpha_linear\Cn_linear; % Cn slope [1/deg]
 Cna = rad2deg(Cna_deg); % Cn slope [1/rad]
+display(Cna);
 
 % Plot Cn and Cc to check if they were calculated correctly
 figure(2);
@@ -67,6 +68,9 @@ fun = fit(alpha, f, ft, 'StartPoint', [14, 3, 1] );
 alpha1 = fun.a1;
 S1 = fun.S1;
 S2 = fun.S2;
+display(alpha1);
+display(S1);
+display(S2);
 
 % Reconstruct the separation point modeling
 n = length(alpha);
