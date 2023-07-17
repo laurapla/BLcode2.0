@@ -1,4 +1,4 @@
-function [Cnf, Cmf, Cc, fprimeprime, fprime] = BL_TEseparation(s_span,Cnprime,C_Nalpha,C_N1,alpha0,alpha,alpha_E,alpha1,dalpha1,S1,S2,T_f,T_vl,K0,K1,K2,eta,D_f)
+function [Cnf, Cmf, Cc, fprimeprime, fprime] = BL_TEseparation(s_span,Cnprime,Cni,C_Nalpha,C_N1,alpha,alpha_E,alpha0,alpha1,dalpha1,S1,S2,T_f,T_vl,K0,K1,K2,eta,D_f)
 
 % Function that computes the variations in the normal force, pitching
 % moment and drag force coefficients due to trailing edge separation
@@ -59,16 +59,16 @@ for i = 2:N
     tolerance = 1e-6;
     while resta>tolerance
         
-        [sigma1, sigma3] = sigma13(Cnprime(i), C_N1, Sa, fprimeprime_ant-fprimeprime(i-1), fprimeprime_ant, fr_ant, tauv(i), T_vl);
+        [sigmafN, sigmafM] = sigmaf(Cnprime(i), C_N1, Sa, fprimeprime_ant-fprimeprime(i-1), fprimeprime_ant, fr_ant, tauv(i), T_vl);
         
         % Unsteady trailing edge separation point (unsteady boundary layer
         % effects)
-        Ef = exp(-sigma1*ds/T_f);
+        Ef = exp(-sigmafN*ds/T_f);
         Df(i) = Df(i-1)*Ef+(fprime(i)-fprime(i-1))*Ef^0.5;
         fprimeprime(i) = fprime(i)-Df(i);
         
         % Reattachment separation point
-        Em = exp(-sigma3*ds/T_f);
+        Em = exp(-sigmafM*ds/T_f);
         Dfr(i) = Dfr(i-1)*Em+(fM(i)-fM(i-1))*Em^0.5;
         fr(i) = fM(i)-Dfr(i);
         
@@ -88,7 +88,7 @@ end
 
 % Normal force coefficient
 Cnc = C_Nalpha*alpha_E; % Circulatory normal force coefficient
-Cnf = Cnc.*((1+sqrt(fprimeprime))/2).^2;
+Cnf = Cni+Cnc.*((1+sqrt(fprimeprime))/2).^2;
 
 % Pitching moment coefficient
 m = 2;

@@ -28,6 +28,10 @@ Ta = 298; % Ambient temperature [K]
 
 % Numerical values
 [eta, C_Nalpha, alpha0, Cd0, Cm0, alpha1, dalpha1, S1, S2, K0, K1, K2, T_P, T_f, C_N1, T_v, T_vl, D_f] = input_NACA0012(M);
+% C_Nalpha = 5.9303;
+% alpha1 = deg2rad(15.0000);
+% S1 = deg2rad(5.2849);
+% S2 = deg2rad(1.0337);
 x_ac = 0.25-K0; % Aerodynamic center normalized by the chord
 
 %% Preliminary calculations
@@ -64,11 +68,11 @@ q = dalpha*c/V; % Non-dimensional pitch rate
 
 %% Stall onset
 
-Cnprime = BL_stallonset(s,T_P,C_Nalpha*alpha_E,Cnp);
+Cnprime = BL_stallonset(s,T_P,Cnp);
 
 %% Trailing edge separation
 
-[Cnf, Cmf, Ccf, fprimeprime, fprime] = BL_TEseparation(s,Cnprime,C_Nalpha,C_N1,alpha0,alpha,alpha_E,alpha1,dalpha1,S1,S2,T_f,T_vl,K0,K1,K2,eta,D_f);
+[Cnf, Cmf, Ccf, fprimeprime] = BL_TEseparation(s,Cnprime,Cni,C_Nalpha,C_N1,alpha,alpha_E,alpha0,alpha1,dalpha1,S1,S2,T_f,T_vl,K0,K1,K2,eta,D_f);
 
 %% Modeling of dynamic stall
 
@@ -77,8 +81,8 @@ Cnprime = BL_stallonset(s,T_P,C_Nalpha*alpha_E,Cnp);
 %% Final results
 
 % Total normal force
-CN = Cnf+Cnv+Cni;
-CM = Cmf+Cmv+Cmp-K0*C_Nalpha*alpha_E;
+CN = Cnf+Cnv;
+CM = Cmf+Cmv+Cmp+C_Nalpha*alpha_E*(x_ac-0.25);
 
 lwidth = 1.7;
 lbl_font = 14;
@@ -97,14 +101,14 @@ CL = CN.*cos(alpha_eff)+Ccf.*sin(alpha_eff);
 CD = CN.*sin(alpha_eff)-Ccf.*cos(alpha_eff)+Cd0;
 
 % Comparison with experimental results
-[alpha_el,CN_e,alpha_ed,CD_e,alpha_em,CM_e] = experimental_results(airfoil,k,M,alphabase,A_alpha,H,phi);
+[alpha_el,CL_e,alpha_ed,CD_e,alpha_em,CM_e] = experimental_results(airfoil,k,M,alphabase,A_alpha,H,phi);
 
 figure(2);
 plot(rad2deg(alpha_eff(N-n_t:N)),CN(N-n_t:N),'r','LineWidth',lwidth)
 xlabel('$\alpha, ^{\circ}$','Interpreter','latex','FontSize',lbl_font);
-ylabel('$C_{L}$','Interpreter','latex','FontSize',lbl_font);
+ylabel('$C_{n}$','Interpreter','latex','FontSize',lbl_font);
 grid on
-hold on; plot(alpha_el,CN_e,'--o','LineWidth',lwidth,'Color',[0.9290 0.6940 0.1250])
+hold on; plot(alpha_el,CL_e,'--o','LineWidth',lwidth,'Color',[0.9290 0.6940 0.1250])
 legend('Model','Experimental','Location','best','FontSize',lgd_font);
 title([airfoil,', k=',num2str(k),', $\alpha=',num2str(rad2deg(alphabase)),'^{o}+',num2str(rad2deg(A_alpha)),'^{o}sin(\omega t)$'],'interpreter','latex');
 ax = gca;
