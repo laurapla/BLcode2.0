@@ -55,24 +55,24 @@ x11 = interp2(oldcols,oldrows,dCv_A(:,:,k_index),newcols,newrows);
 %% Average Cd
 
 n_terms = 7;
-term = zeros(N,n_A_array,n_terms);
+term_Cd = zeros(N,n_A_array,n_terms);
 
 for j = 1:n_A_array
     
     % Average drag coefficient
-    term(:,j,1) = x11(:,j).*sin(alpha);
-    term(:,j,2) = C_Nalpha/2*alpha.*(1+sqrt(x10)).^2/2.*sin(alpha);
-    term(:,j,3) = -C_Nalpha/2*alpha*2*eta.*alpha.*sqrt(x10).*cos(alpha);
-    term(:,j,4) = -deg2rad(A_alpha(j))^2/4*x11(:,j).*sin(alpha);
-    term(:,j,5) = deg2rad(A_alpha(j))^2/4*8*cos(alpha)/M;
-    term(:,j,6) = -deg2rad(A_alpha(j))^2/4*C_Nalpha*alpha/2.*(1+sqrt(x10)).^2/2.*sin(alpha);
-    term(:,j,7) = deg2rad(A_alpha(j))^2/4*eta*C_Nalpha*alpha.^2.*sqrt(x10).*cos(alpha);
+    term_Cd(:,j,1) = x11(:,j).*sin(alpha);
+    term_Cd(:,j,2) = C_Nalpha/2*alpha.*(1+sqrt(x10)).^2/2.*sin(alpha);
+    term_Cd(:,j,3) = -C_Nalpha/2*alpha*2*eta.*alpha.*sqrt(x10).*cos(alpha);
+    term_Cd(:,j,4) = -deg2rad(A_alpha(j))^2/4*x11(:,j).*sin(alpha);
+    term_Cd(:,j,5) = deg2rad(A_alpha(j))^2/4*8*cos(alpha)/M;
+    term_Cd(:,j,6) = -deg2rad(A_alpha(j))^2/4*C_Nalpha*alpha/2.*(1+sqrt(x10)).^2/2.*sin(alpha);
+    term_Cd(:,j,7) = deg2rad(A_alpha(j))^2/4*eta*C_Nalpha*alpha.^2.*sqrt(x10).*cos(alpha);
     
 end
 
 Cd = zeros(N,n_A_array);
 for i = 1:n_terms
-    Cd = Cd+term(:,:,i);
+    Cd = Cd+term_Cd(:,:,i);
 end
 
 %% Static value
@@ -120,7 +120,7 @@ index = 6;
 figure;
 colororder(Okabe_Ito)
 for i = 1:n_terms
-    plot(rad2deg(alpha),term(:,index,i),symbols{i},'LineWidth',line_width);
+    plot(rad2deg(alpha),term_Cd(:,index,i),symbols{i},'LineWidth',line_width);
     hold on;
 end
 
@@ -142,9 +142,9 @@ figure;
 colororder(Okabe_Ito)
 for i = 1:4
     if i==4
-        plot(rad2deg(alpha),term(:,index,4)+term(:,index,5)+term(:,index,6)+term(:,index,7),symbols{i},'LineWidth',line_width);
+        plot(rad2deg(alpha),term_Cd(:,index,4)+term_Cd(:,index,5)+term_Cd(:,index,6)+term_Cd(:,index,7),symbols{i},'LineWidth',line_width);
     else
-        plot(rad2deg(alpha),term(:,index,i),symbols{i},'LineWidth',line_width);
+        plot(rad2deg(alpha),term_Cd(:,index,i),symbols{i},'LineWidth',line_width);
     end
     hold on;
 end

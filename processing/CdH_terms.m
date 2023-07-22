@@ -56,20 +56,20 @@ x11 = interp2(oldcols,oldrows,dCv_H(:,:,k_index),newcols,newrows);
 %% Average Cd
 
 n_terms = 3;
-term = zeros(N,n_H_array,n_terms);
+term_Cd = zeros(N,n_H_array,n_terms);
 
 for j = 1:n_H_array
     
     % Average drag coefficient
-    term(:,j,1) = x11(:,j).*sin(alpha);
-    term(:,j,2) = C_Nalpha/2*(alpha-H(j)*k*sin(phi)).*(1+sqrt(x10)).^2/2.*sin(alpha);
-    term(:,j,3) = -C_Nalpha/2*(alpha-H(j)*k*sin(phi))*2*eta.*(alpha-H(j)*k*sin(phi)).*sqrt(x10).*cos(alpha);
+    term_Cd(:,j,1) = x11(:,j).*sin(alpha);
+    term_Cd(:,j,2) = C_Nalpha/2*(alpha-H(j)*k*sin(phi)).*(1+sqrt(x10)).^2/2.*sin(alpha);
+    term_Cd(:,j,3) = -C_Nalpha/2*(alpha-H(j)*k*sin(phi))*2*eta.*(alpha-H(j)*k*sin(phi)).*sqrt(x10).*cos(alpha);
     
 end
 
 Cd = zeros(N,n_H_array);
 for i = 1:n_terms
-    Cd = Cd+term(:,:,i);
+    Cd = Cd+term_Cd(:,:,i);
 end
 
 %% Static value
@@ -117,7 +117,7 @@ index = 5;
 figure;
 colororder(Okabe_Ito)
 for i = 1:n_terms
-    plot(rad2deg(alpha),term(:,index,i),symbols{i},'LineWidth',line_width);
+    plot(rad2deg(alpha),term_Cd(:,index,i),symbols{i},'LineWidth',line_width);
     hold on;
 end
 

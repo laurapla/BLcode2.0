@@ -1,19 +1,19 @@
-% Processing the results of dCv as a function of k, A_alpha, and H
+%% Processing the results of dCv as a function of k, A_alpha, and H
 % University of California, Irvine - Winter 2022
 % Laura Pla Olea - lplaolea@uci.edu
 
-clear; clc; close all
-addpath(genpath('../'),genpath('/data/M0.7'))
+clear; clc;
+addpath(genpath('/dCv_data/M0.7'))
 
 %% Get and store data
 
 n_k = 21;
 k_array = linspace(0,1,n_k);
 
-n_alpha = 20;
+n_alpha = 150;
 alpha_array = linspace(0,pi/4,n_alpha);
 
-n_A = 11;
+n_A = 6;
 dCv_A_array = zeros(n_alpha,n_A);
 dCv_A = zeros(n_alpha,n_A,n_k);
 
@@ -49,7 +49,7 @@ for i = 1:n_k
         dCv_array = dCv_matrix(:,:,j);
         
         % Storing the results
-        dCv_H_array(:,j) = mean(dCv_array);
+        dCv_H_array(:,j) = mean(dCv_array,'omitnan');
         dCv_H_array(isinf(dCv_H_array)|isnan(dCv_H_array)) = 0;
         
     end
@@ -121,11 +121,11 @@ grid on;
 
 k_index = 3; % Determines the k for which we plot the results
 
-Legend_A = cell(7,1);
+Legend_A = cell(n_A,1);
 
 figure(3);
 colororder(Okabe_Ito)
-for i = 1:7
+for i = 1:n_A
     
     if i==1
         plot(rad2deg(alpha_array),squeeze(dCv_A(:,i,k_index)),'k','LineWidth',width);

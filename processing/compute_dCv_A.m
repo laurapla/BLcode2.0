@@ -3,7 +3,7 @@
 % University of California, Irvine - Fall 2021
 % Laura Pla Olea - lplaolea@uci.edu
 
-clear; clc; close all
+clear; clc; close all;
 addpath(genpath('../'))
 
 %% Input data
@@ -24,6 +24,10 @@ Ta = 298; % Ambient temperature [K]
 
 % Numerical values
 [eta, C_Nalpha, alpha0, Cd0, Cm0, alpha1, dalpha1, S1, S2, K0, K1, K2, T_P, T_f, C_N1, T_v, T_vl, D_f] = input_NACA0012(M);
+C_Nalpha = 5.9303;
+alpha1 = deg2rad(15);
+S1 = deg2rad(5.284944901391905);
+S2 = deg2rad(1.033663269609409);
 x_ac = 0.25-K0; % Aerodynamic center normalized by the chord
 
 %% Preliminary calculations
@@ -42,9 +46,9 @@ N = n_cycles*n_t;
 t = linspace(0,n_cycles*T,N); % Time vector [s]
 s = V*t/b; % Non-dimensional time vector
 
-n_A = 11;
-n_alpha = 20;
-A_array = linspace(0,10,n_A);
+n_A = 6;
+n_alpha = 150;
+A_array = linspace(0,n_A-1,n_A);
 dCv_matrix = zeros(n_t+1,n_alpha,n_A);
 
 for index = 1:n_A
@@ -84,12 +88,12 @@ for index = 1:n_A
         
         % Stall onset
         
-        Cnprime = BL_stallonset(s,T_P,C_Nalpha*alpha_E,Cnp);
+        Cnprime = BL_stallonset(s,T_P,Cnp);
         
         
         % Trailing edge separation
         
-        [Cnf, Cmf, Ccf, fprimeprime, fprime] = BL_TEseparation(s,Cnprime,C_Nalpha,C_N1,alpha0,alpha_eff,alpha_E,alpha1,dalpha1,S1,S2,T_f,T_vl,K0,K1,K2,eta,D_f);
+        [Cnf, Cmf, Ccf, fprimeprime] = BL_TEseparation(s,Cnprime,Cni,C_Nalpha,C_N1,alpha_eff,alpha_E,alpha0,alpha1,dalpha1,S1,S2,T_f,T_vl,K0,K1,K2,eta,D_f);
         
         
         % Modeling of dynamic stall
@@ -110,7 +114,7 @@ for index = 1:n_A
             ds_span = s(j_index)-s(j_index-1);
             Sa = alpha_eff(j_index)-alpha_eff(j_index-1);
             df = fprimeprime(j_index)-fprimeprime(j_index-1);
-            sigma = sigma2(tauv(j_index), T_vl, Sa, df);
+            sigma = sigmav(tauv(j_index), T_vl, Sa, df);
             
             if tauv(j_index)>0 && tauv(j_index)<=T_vl
                 Ds(j_index) = 1;
@@ -123,7 +127,7 @@ for index = 1:n_A
             end
             
             Cv(j_index) = Ds(j_index)*Cnc(j_index)*(1-Kn(j_index));
-            
+
             Ds2 = Ds;
             if Ds(j_index)==1 && Ds(j_index-1)==0
                 Ds2(j_index)=0;
@@ -134,8 +138,15 @@ for index = 1:n_A
             end
             
         end
+
+
+        dCv_matrix(:,j,index) = Ds2(N-n_t:N).*gradient(Cv(N-n_t:N))./gradient(s(N-n_t:N));
         
-        dCv_matrix(:,j,index) = Ds2(N-n_t:N).*gradient(Cv(N-n_t:N))./gradient(t(N-n_t:N));
+%         close all;
+%         figure;
+%         plot(s(N-n_t:N),dCv_matrix(:,j,index),[s(N-n_t) s(N)],[mean(dCv_matrix(:,j,index)) mean(dCv_matrix(:,j,index))]);
+%         xlabel('s'); ylabel('dCv'); legend('time-varying', 'mean'); grid on;
+%         title(['\alpha^{*}=',num2str(rad2deg(alphabase)),'º, A_{\alpha}=',num2str(rad2deg(A_alpha)),'º, k=',num2str(k)]);
         
     end
     
@@ -148,7 +159,7 @@ save(filename,'A_array','dCv_matrix','t');
 
 % Storing the results
 dCv = zeros(n_alpha,n_A);
-interval = 2;
+interval = 1;
 
 for j = 1:n_A
     
@@ -158,9 +169,9 @@ for j = 1:n_A
     dCv(:,j) = mean(dCv_array);
     dCv(isinf(dCv)|isnan(dCv)) = 0;
     
-    if rem(round(A_array(j)),interval)==0
-        hold on;
+    if rem(A_array(j),interval)==0
         plot(rad2deg(alpha_array),dCv(:,j))
+        hold on;
     end
     
 end
@@ -173,9 +184,10 @@ for iter=1:n_A
         Legend{(ceil(iter/interval))} = strcat('A_{\alpha}=', num2str((A_array(iter))), 'º');
     end
 end
-legend(Legend,'Location','northwest')
+legend(Legend,'Location','best')
 
 xlabel('\alpha [º]'); ylabel('$\dot{C}_{v}^{*}$','interpreter','latex');
+grid on;
 
 % %% Plot as a function of the parameter
 % 
