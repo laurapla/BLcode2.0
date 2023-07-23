@@ -2,8 +2,8 @@
 % University of California, Irvine - Winter 2022
 % Laura Pla Olea - lplaolea@uci.edu
 
-clear; clc;
-addpath(genpath('/dCv_data/M0.7'))
+clear; clc; close all;
+M = 0.3;
 
 %% Get and store data
 
@@ -23,7 +23,7 @@ dCv_H = zeros(n_alpha,n_H,n_k);
 
 for i = 1:n_k
     
-    filenameA = ['dCv_A_k',num2str(5*(i-1))];
+    filenameA = ['dCv_data/M',num2str(M),'/dCv_A_k',num2str(5*(i-1))];
     load(filenameA);
     
     % Storing the results
@@ -40,7 +40,7 @@ for i = 1:n_k
     dCv_A(:,:,i) = dCv_A_array;
     
     
-    filenameH = ['dCv_H_k',num2str(5*(i-1))];
+    filenameH = ['dCv_data/M',num2str(M),'/dCv_H_k',num2str(5*(i-1))];
     load(filenameH);
     
     % Storing the results

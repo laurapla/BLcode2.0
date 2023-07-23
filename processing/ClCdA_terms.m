@@ -9,14 +9,12 @@ clear; clc; close all;
 % Geometry
 airfoil = ('NACA0012');
 M = 0.3; % Mach number
-k = 0.1; % Reduced frequency
+k = 0.5; % Reduced frequency
 A_display = 5; % Pitching amplitude of interest [deg]
 
 %% Loading files
 
-addpath(genpath('/dCv_data'))
-load(strcat('dCvM', num2str(M), '.mat'));
-load('CN_NACA0012_static.mat');
+load(strcat('dCv_data/dCvM', num2str(M), '.mat'));
 
 %% Pre-calculations
 
@@ -25,7 +23,7 @@ n_k_array = length(k_array);
 n_alpha_array = length(alpha_array);
 
 % Motion
-A_alpha = linspace(0,10,n_A_array); % Pitching amplitude [rad]
+A_alpha = linspace(0,5,n_A_array); % Pitching amplitude [rad]
 phi = deg2rad(0); % Phase between the pitching and plunging motions [rad]
 
 % Numerical values
@@ -69,7 +67,7 @@ for j = 1:n_A_array
     % Average lift coefficient
     term_Cl(:,j,1) = x11(:,j).*cos(alpha);
     term_Cl(:,j,2) = C_Nalpha/2*alpha.*(1+sqrt(x10)).^2/2.*cos(alpha);
-    term_Cl(:,j,3) = C_Nalpha/2*alpha*2*eta.*tan(alpha).*sqrt(x10).*sin(alpha);
+    term_Cl(:,j,3) = C_Nalpha/2*alpha*2*eta.*alpha.*sqrt(x10).*sin(alpha);
     term_Cl(:,j,4) = -deg2rad(A_alpha(j))^2/4*x11(:,j).*cos(alpha);
     term_Cl(:,j,5) = -deg2rad(A_alpha(j))^2/4*8*sin(alpha)/M;
     term_Cl(:,j,6) = -deg2rad(A_alpha(j))^2/4*C_Nalpha*alpha/2.*(1+sqrt(x10)).^2/2.*cos(alpha);
@@ -173,7 +171,7 @@ legend('$\dot{C}_{v}^{*}\cos\alpha^{*}$','$C_{N_{\alpha}}\alpha^{*}(1+\sqrt{x_{0
     ,'$-A_{\alpha}^{2}\dot{C}_{v}^{*}\cos\alpha^{*}/4$','$-2A_{\alpha}^{2}\sin\alpha^{*}/M$'...
     ,'$-A_{\alpha}^{2}C_{N_{\alpha}}\alpha^{*}(1+\sqrt{x_{0}^{*}})^2\cos\alpha^{*}/16$'...
     ,'$-A_{\alpha}^{2}\eta C_{N_{\alpha}}\alpha^{*2}\sqrt{x_{0}^{*}}\sin\alpha^{*}/4$'...
-    ,'Location','best','interpreter','latex','FontSize',font_lgd,'NumColumns',2)
+    ,'Location','northoutside','interpreter','latex','FontSize',font_lgd,'NumColumns',2)
 
 xlim([0 max(rad2deg(alpha))])
 grid on;
@@ -195,7 +193,7 @@ legend('$\dot{C}_{v}^{*}\sin\alpha^{*}$','$C_{N_{\alpha}}\alpha^{*}(1+\sqrt{x_{0
     ,'$-A_{\alpha}^{2}\dot{C}_{v}^{*}\sin\alpha^{*}/4$','$2A_{\alpha}^{2}\cos\alpha^{*}/M$'...
     ,'$-A_{\alpha}^{2}C_{N_{\alpha}}\alpha^{*}(1+\sqrt{x_{0}^{*}})^2\sin\alpha^{*}/16$'...
     ,'$A_{\alpha}^{2}\eta C_{N_{\alpha}}\alpha^{*2}\sqrt{x_{0}^{*}}\cos\alpha^{*}/4$'...
-    ,'Location','best','interpreter','latex','FontSize',font_lgd,'NumColumns',2)
+    ,'Location','northoutside','interpreter','latex','FontSize',font_lgd,'NumColumns',2)
 
 xlim([0 max(rad2deg(alpha))])
 grid on;

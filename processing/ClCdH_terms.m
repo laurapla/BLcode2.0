@@ -2,13 +2,13 @@
 % University of California, Irvine - Fall 2022
 % Laura Pla Olea - lplaolea@uci.edu
 
-clear; clc; 
+clear; clc; close all;
 
 %% Input data
 
 % Geometry
 airfoil = ('NACA0012');
-M = 0.3; % Mach number
+M = 0.7; % Mach number
 k = 0.5; % Reduced frequency
 H_display = 0.2; % Amplitude to look at
 

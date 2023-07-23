@@ -11,8 +11,8 @@ clear; clc; close all
 airfoil = ('NACA0012');
 c = 1; % Airfoil chord [m]
 e = -1/2*1/2; % Pitching axis (measured from the midchord) normalized by the chord
-M = 0.7; % Mach number
-k = 0; % Reduced frequency
+M = 0.3; % Mach number
+k = 0.5; % Reduced frequency
 n_cycles = 10; % Number of cycles that are computed
 n_t = 1e2; % Number of time steps per cycle
 
@@ -163,7 +163,7 @@ for j = 1:n_A
     dCv(:,j) = mean(dCv_array,'omitnan');
     dCv(isinf(dCv)|isnan(dCv)) = 0;
     
-    if rem(round(H_array(j)),interval)==0
+    if rem(round(H_array(j)),interval)<=1e-5
         hold on;
         plot(rad2deg(alpha_array),dCv(:,j))
     end
@@ -182,30 +182,3 @@ legend(Legend,'Location','best')
 
 xlabel('\alpha [º]'); ylabel('$\dot{C}_{v}^{*}$','interpreter','latex');
 grid on;
-
-% %% Plot as a function of the parameter
-% 
-% interval_angle = 1;
-% fffit = zeros(3,floor(n_alpha/interval_angle));
-% 
-% figure(2);
-% for j = 1:n_alpha
-%     f = fit(H_array.',dCv(j,:).','poly2');
-%     fffit(:,j) = coeffvalues(f);
-%     if rem(j-1,interval_angle)==0
-%         hold on;
-%         plot(H_array,dCv(j,:));
-%     end
-% end
-% 
-% Legend2 = cell(floor(n_alpha/interval_angle),1);
-% for iter = 1:n_alpha
-%     if rem(iter-1,interval_angle)==0
-%         Legend2{(iter-1)/interval_angle+1} = strcat('\alpha^{*}=', num2str(round(rad2deg(alpha_array(iter)))), 'º');
-%     end
-% end
-% legend(Legend2,'Location','bestoutside','NumColumns',2)
-% 
-% xlabel('H');
-% 
-% ylabel('$\dot{C}_{v}^{*}$','interpreter','latex');
