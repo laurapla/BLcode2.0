@@ -70,21 +70,24 @@ symbols = {'-', '--', ':','-.','-', '--', ':','-.','-', '--', ':','-.','-', '--'
 Okabe_Ito = [0.902 0.624 0; 0.337 0.737 0.914; 0 0.62 0.451;
 0.941 0.894 0.259; 0 0.447 0.698; 0.835 0.369 0; 0.8 0.475 0.655];
 
-A_index = 3; % Determines the A_alpha for which we plot the results
+A_index = 6; % Determines the A_alpha for which we plot the results
+target_alpha = 0:2:22;
+n_target = length(target_alpha);
 
 Legend_alpha = cell(12,1);
 
 figure(1);
 colororder(Okabe_Ito)
-for i = 1:12
+for i = 1:length(target_alpha)
 
+    [~,ind] = min(abs(rad2deg(alpha_array)-target_alpha(i)));
     if i==1
-        plot(k_array,squeeze(dCv_A(i,A_index,:)),'k','LineWidth',width);
+        plot(k_array,squeeze(dCv_A(ind,A_index,:)),'k','LineWidth',width);
     else
-        plot(k_array,squeeze(dCv_A(i,A_index,:)),symbols{i},'LineWidth',width);
+        plot(k_array,squeeze(dCv_A(ind,A_index,:)),symbols{i},'LineWidth',width);
     end
     hold on;
-    Legend_alpha{i} = strcat('$\alpha^{*}=$', num2str(round(rad2deg(alpha_array(i)))), '$^{\circ}$');
+    Legend_alpha{i} = strcat('$\alpha^{*}=$', num2str(round(rad2deg(alpha_array(ind)))), '$^{\circ}$');
     
 end
 
@@ -96,16 +99,17 @@ grid on;
 
 %% Plot dCv vs. alpha as a function of k (for a given H)
 
-H_index = 3; % Determines the H for which we plot the results
+H_index = 5; % Determines the H for which we plot the results
 
 figure(2);
 colororder(Okabe_Ito)
-for i = 1:12
+for i = 1:n_target
     
+    [~,ind] = min(abs(rad2deg(alpha_array)-target_alpha(i)));
     if i==1
-        plot(k_array,squeeze(dCv_H(i,H_index,:)),'k','LineWidth',width);
+        plot(k_array,squeeze(dCv_H(ind,H_index,:)),'k','LineWidth',width);
     else
-        plot(k_array,squeeze(dCv_H(i,H_index,:)),symbols{i},'LineWidth',width);
+        plot(k_array,squeeze(dCv_H(ind,H_index,:)),symbols{i},'LineWidth',width);
     end
     hold on;
     
@@ -119,7 +123,7 @@ grid on;
 
 %% Plot dCv vs. alpha as a function of A_alpha (for a given k)
 
-k_index = 3; % Determines the k for which we plot the results
+k_index = 11; % Determines the k for which we plot the results
 
 Legend_A = cell(n_A,1);
 
@@ -145,7 +149,7 @@ grid on;
 
 %% Plot dCv as a function of the plunging amplitude (for a given k)
 
-k_index = 7; % Determines the k for which we plot the results
+k_index = 11; % Determines the k for which we plot the results
 
 Legend_H = cell(n_H,1);
 
@@ -171,16 +175,17 @@ grid on;
 
 %% Plot dCv vs. A_alpha as a function of alpha (for a given k)
 
-k_index = 3; % Determines the k for which we plot the results
+k_index = 11; % Determines the k for which we plot the results
 
 figure(5);
 colororder(Okabe_Ito)
-for i = 1:12
-    
+for i = 1:n_target
+
+    [~,ind] = min(abs(rad2deg(alpha_array)-target_alpha(i)));
     if i==1
-        plot(A_array,squeeze(dCv_A(i,:,k_index)),'k','LineWidth',width);
+        plot(A_array,squeeze(dCv_A(ind,:,k_index)),'k','LineWidth',width);
     else
-        plot(A_array,squeeze(dCv_A(i,:,k_index)),symbols{i},'LineWidth',width);
+        plot(A_array,squeeze(dCv_A(ind,:,k_index)),symbols{i},'LineWidth',width);
     end
     hold on;
     
@@ -194,16 +199,17 @@ grid on;
 
 %% Plot dCv vs. H as a function of alpha (for a given k)
 
-k_index = 7; % Determines the k for which we plot the results
+k_index = 11; % Determines the k for which we plot the results
 
 figure(6);
 colororder(Okabe_Ito)
-for i = 1:12
+for i = 1:n_target
     
+    [~,ind] = min(abs(rad2deg(alpha_array)-target_alpha(i)));
     if i==1
-        plot(H_array,squeeze(dCv_H(i,:,k_index)),'k','LineWidth',width);
+        plot(H_array,squeeze(dCv_H(ind,:,k_index)),'k','LineWidth',width);
     else
-        plot(H_array,squeeze(dCv_H(i,:,k_index)),symbols{i},'LineWidth',width);
+        plot(H_array,squeeze(dCv_H(ind,:,k_index)),symbols{i},'LineWidth',width);
     end
     hold on;
     
