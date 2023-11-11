@@ -14,6 +14,7 @@ A_display = 5; % Pitching amplitude of interest [deg]
 
 %% Loading files
 
+addpath('C:\Users\laura\Documents\GitHub\BLcode2.0')
 load(strcat('dCv_data/dCvM', num2str(M), '.mat'));
 
 %% Pre-calculations
@@ -69,7 +70,7 @@ for j = 1:n_A_array
     term_Cl(:,j,2) = C_Nalpha/2*alpha.*(1+sqrt(x10)).^2/2.*cos(alpha);
     term_Cl(:,j,3) = C_Nalpha/2*alpha*2*eta.*alpha.*sqrt(x10).*sin(alpha);
     term_Cl(:,j,4) = -deg2rad(A_alpha(j))^2/4*x11(:,j).*cos(alpha);
-    term_Cl(:,j,5) = -deg2rad(A_alpha(j))^2/4*8*sin(alpha)/M;
+    term_Cl(:,j,5) = -deg2rad(A_alpha(j))^2*2*sin(alpha)/M;
     term_Cl(:,j,6) = -deg2rad(A_alpha(j))^2/4*C_Nalpha*alpha/2.*(1+sqrt(x10)).^2/2.*cos(alpha);
     term_Cl(:,j,7) = -deg2rad(A_alpha(j))^2/4*eta*C_Nalpha*alpha.^2.*sqrt(x10).*sin(alpha);
 
@@ -78,7 +79,7 @@ for j = 1:n_A_array
     term_Cd(:,j,2) = C_Nalpha/2*alpha.*(1+sqrt(x10)).^2/2.*sin(alpha);
     term_Cd(:,j,3) = -C_Nalpha/2*alpha*2*eta.*alpha.*sqrt(x10).*cos(alpha);
     term_Cd(:,j,4) = -deg2rad(A_alpha(j))^2/4*x11(:,j).*sin(alpha);
-    term_Cd(:,j,5) = deg2rad(A_alpha(j))^2/4*8*cos(alpha)/M;
+    term_Cd(:,j,5) = deg2rad(A_alpha(j))^2*2*cos(alpha)/M;
     term_Cd(:,j,6) = -deg2rad(A_alpha(j))^2/4*C_Nalpha*alpha/2.*(1+sqrt(x10)).^2/2.*sin(alpha);
     term_Cd(:,j,7) = deg2rad(A_alpha(j))^2/4*eta*C_Nalpha*alpha.^2.*sqrt(x10).*cos(alpha);
     
@@ -156,21 +157,23 @@ grid on;
 
 index = find(A_array==A_display);
 
+maxCv = max(x11(:,index));
+
 figure;
 colororder(Okabe_Ito)
 for i = 1:n_terms
-    plot(rad2deg(alpha),term_Cl(:,index,i)-term_Cl(:,1,i),symbols{i},'LineWidth',line_width);
+    plot(rad2deg(alpha),(term_Cl(:,index,i)-term_Cl(:,1,i))/maxCv,symbols{i},'LineWidth',line_width);
     hold on;
 end
 
 xlabel('$\alpha^{*}, ^{\circ}$','interpreter','latex','FontSize',font_labels);
-ylabel('$\overline{C}_{L}(\alpha^{*})-C_{L_{s}}(\alpha^{*})$','interpreter','latex','FontSize',font_labels);
+ylabel('$\left[\bar{C}_{L}(\alpha^{*})-C_{L_{s}}(\alpha^{*})\right]/\max{\dot{C}_{v}^{*}}$','interpreter','latex','FontSize',font_labels);
 
-legend('$\dot{C}_{v}^{*}\cos\alpha^{*}$','$C_{N_{\alpha}}\alpha^{*}(1+\sqrt{x_{0}^{*}})^2\cos\alpha^{*}/4$'...
-    ,'$\eta C_{N_{\alpha}}\alpha^{*2}\sqrt{x_{0}^{*}}\sin\alpha^{*}$'...
-    ,'$-A_{\alpha}^{2}\dot{C}_{v}^{*}\cos\alpha^{*}/4$','$-2A_{\alpha}^{2}\sin\alpha^{*}/M$'...
-    ,'$-A_{\alpha}^{2}C_{N_{\alpha}}\alpha^{*}(1+\sqrt{x_{0}^{*}})^2\cos\alpha^{*}/16$'...
-    ,'$-A_{\alpha}^{2}\eta C_{N_{\alpha}}\alpha^{*2}\sqrt{x_{0}^{*}}\sin\alpha^{*}/4$'...
+legend('LEV','Normal force'...
+    ,'Tangential force'...
+    ,'Pitching --- LEV','Pitching --- Added mass'...
+    ,'Pitching --- Normal force'...
+    ,'Pitching --- Tangential force'...
     ,'Location','northoutside','interpreter','latex','FontSize',font_lgd,'NumColumns',2)
 
 xlim([0 max(rad2deg(alpha))])
@@ -181,18 +184,18 @@ grid on;
 figure;
 colororder(Okabe_Ito)
 for i = 1:n_terms
-    plot(rad2deg(alpha),term_Cd(:,index,i),symbols{i},'LineWidth',line_width);
+    plot(rad2deg(alpha),(term_Cd(:,index,i)-term_Cd(:,1,i))/maxCv,symbols{i},'LineWidth',line_width);
     hold on;
 end
 
 xlabel('$\alpha^{*}, ^{\circ}$','interpreter','latex','FontSize',font_labels);
-ylabel('$\overline{C}_{D}(\alpha^{*})-C_{D_{s}}(\alpha^{*})$','interpreter','latex','FontSize',font_labels);
+ylabel('$\left[\bar{C}_{D}(\alpha^{*})-C_{D_{s}}(\alpha^{*})\right]/\max{\dot{C}_{v}^{*}}$','interpreter','latex','FontSize',font_labels);
 
-legend('$\dot{C}_{v}^{*}\sin\alpha^{*}$','$C_{N_{\alpha}}\alpha^{*}(1+\sqrt{x_{0}^{*}})^2\sin\alpha^{*}/4$'...
-    ,'$-\eta C_{N_{\alpha}}\alpha^{*2}\sqrt{x_{0}^{*}}\cos\alpha^{*}$'...
-    ,'$-A_{\alpha}^{2}\dot{C}_{v}^{*}\sin\alpha^{*}/4$','$2A_{\alpha}^{2}\cos\alpha^{*}/M$'...
-    ,'$-A_{\alpha}^{2}C_{N_{\alpha}}\alpha^{*}(1+\sqrt{x_{0}^{*}})^2\sin\alpha^{*}/16$'...
-    ,'$A_{\alpha}^{2}\eta C_{N_{\alpha}}\alpha^{*2}\sqrt{x_{0}^{*}}\cos\alpha^{*}/4$'...
+legend('LEV','Normal force'...
+    ,'Tangential force'...
+    ,'Pitching --- LEV','Pitching --- Added mass'...
+    ,'Pitching --- Normal force'...
+    ,'Pitching --- Tangential force'...
     ,'Location','northoutside','interpreter','latex','FontSize',font_lgd,'NumColumns',2)
 
 xlim([0 max(rad2deg(alpha))])

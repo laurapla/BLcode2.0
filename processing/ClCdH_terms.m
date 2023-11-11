@@ -2,20 +2,20 @@
 % University of California, Irvine - Fall 2022
 % Laura Pla Olea - lplaolea@uci.edu
 
-clear; clc; close all;
+clear; clc; 
 
 %% Input data
 
 % Geometry
 airfoil = ('NACA0012');
-M = 0.7; % Mach number
+M = 0.3; % Mach number
 k = 0.5; % Reduced frequency
 H_display = 0.2; % Amplitude to look at
 
 %% Loading files
 
-addpath(genpath('/dCv_data'))
-load(strcat('dCvM', num2str(M), '.mat'));
+addpath('C:\Users\laura\Documents\GitHub\BLcode2.0')
+load(strcat('dCv_data/dCvM', num2str(M), '.mat'));
 
 %% Pre-calculations
 
@@ -150,21 +150,22 @@ grid on;
 
 index = find(H_array==H_display);
 
+maxCv = max(x11(:,index));
+
 % Cl
 
 figure;
 colororder(Okabe_Ito)
 for i = 1:n_terms
-    plot(rad2deg(alpha),term_Cl(:,index,i)-term_Cl(:,1,i),symbols{i},'LineWidth',line_width);
+    plot(rad2deg(alpha),(term_Cl(:,index,i)-term_Cl(:,1,i))/maxCv,symbols{i},'LineWidth',line_width);
     hold on;
 end
 
 xlabel('$\alpha^{*}, ^{\circ}$','interpreter','latex','FontSize',font_labels);
-ylabel('$\overline{C}_{L}(\alpha^{*})-C_{L_{s}}(\alpha^{*})$','interpreter','latex','FontSize',font_labels);
+ylabel('$\left[\bar{C}_{L}(\alpha^{*})-C_{L_{s}}(\alpha^{*})\right]/\max{\dot{C}_{v}^{*}}$','interpreter','latex','FontSize',font_labels);
 
-legend('$\dot{C}_{v}^{*}\cos\alpha^{*}$','$C_{N_{\alpha}}(\alpha^{*}-Hbk\sin\phi)(1+\sqrt{x_{0}^{*}})^2\cos\alpha^{*}/4$'...
-    ,'$\eta C_{N_{\alpha}}(\alpha^{*}-Hbk\sin\phi)^2\sqrt{x_{0}^{*}}\sin\alpha^{*}$'...
-    ,'Location','best','interpreter','latex','FontSize',font_lgd)
+legend('LEV','Normal force','Tangential force'...
+    ,'Location','southeast','interpreter','latex','FontSize',font_lgd)
 
 xlim([0 max(rad2deg(alpha))])
 grid on;
@@ -174,16 +175,15 @@ grid on;
 figure;
 colororder(Okabe_Ito)
 for i = 1:n_terms
-    plot(rad2deg(alpha),term_Cd(:,index,i)-term_Cd(:,1,i),symbols{i},'LineWidth',line_width);
+    plot(rad2deg(alpha),(term_Cd(:,index,i)-term_Cd(:,1,i))/maxCv,symbols{i},'LineWidth',line_width);
     hold on;
 end
 
 xlabel('$\alpha^{*}, ^{\circ}$','interpreter','latex','FontSize',font_labels);
-ylabel('$\overline{C}_{D}(\alpha^{*})-C_{D_{s}}(\alpha^{*})$','interpreter','latex','FontSize',font_labels);
+ylabel('$\left[\bar{C}_{D}(\alpha^{*})-C_{D_{s}}(\alpha^{*})\right]/\max{\dot{C}_{v}^{*}}$','interpreter','latex','FontSize',font_labels);
 
-legend('$\dot{C}_{v}^{*}\sin\alpha^{*}$','$C_{N_{\alpha}}(\alpha^{*}-Hbk\sin\phi)(1+\sqrt{x_{0}^{*}})^2\sin\alpha^{*}/4$'...
-    ,'$-\eta C_{N_{\alpha}}(\alpha^{*}-Hbk\sin\phi)^2\sqrt{x_{0}^{*}}\cos\alpha^{*}$'...
-    ,'Location','best','interpreter','latex','FontSize',font_lgd)
+legend('LEV','Normal force','Tangential force'...
+    ,'Location','southeast','interpreter','latex','FontSize',font_lgd)
 
 xlim([0 max(rad2deg(alpha))])
 grid on;
