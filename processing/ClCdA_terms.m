@@ -2,13 +2,13 @@
 % University of California, Irvine - Fall 2022
 % Laura Pla Olea - lplaolea@uci.edu
 
-clear; clc; close all;
+clear; clc; close all
 
 %% Input data
 
 % Geometry
 airfoil = ('NACA0012');
-M = 0.3; % Mach number
+M = 0.1; % Mach number
 k = 0.5; % Reduced frequency
 A_display = 5; % Pitching amplitude of interest [deg]
 
@@ -157,7 +157,15 @@ grid on;
 
 index = find(A_array==A_display);
 
-maxCv = max(x11(:,index));
+% Determine maximum Cv at M=0.1
+if M==0.1
+    maxCv = max(x11(:,index))
+else
+    dCv1 = load(strcat('dCv_data/dCvM0.1.mat'));
+    [dCv1_oldcols,dCv1_oldrows] = meshgrid(dCv1.A_array,dCv1.alpha_array);
+    dCv1_x11 = interp2(dCv1_oldcols,dCv1_oldrows,dCv1.dCv_A(:,:,k_index),newcols,newrows);
+    maxCv = max(dCv1_x11(:,index));
+end
 
 figure;
 colororder(Okabe_Ito)
@@ -178,6 +186,8 @@ legend('LEV','Normal force'...
 
 xlim([0 max(rad2deg(alpha))])
 grid on;
+set(gcf,'Position',[100 100 560 525])
+saveas(gcf,['Clterms_A',num2str(A_display),'_M0p',num2str(10*M)],'epsc')
 
 % Cd
 
@@ -200,3 +210,5 @@ legend('LEV','Normal force'...
 
 xlim([0 max(rad2deg(alpha))])
 grid on;
+set(gcf,'Position',[100 100 560 525])
+saveas(gcf,['Cdterms_A',num2str(A_display),'_M0p',num2str(10*M)],'epsc')
